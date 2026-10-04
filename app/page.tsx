@@ -48,6 +48,19 @@ export default function Page() {
     })
   }
 
+  function toggleAllHabits() {
+    setHabits((current) => {
+      const shouldComplete = current.some((habit) => !habit.completed)
+      const next = current.map((habit) => ({ ...habit, completed: shouldComplete }))
+      setHistory((saved) => ({ ...saved, [selectedDay]: next }))
+      if (shouldComplete && next.length > 0) {
+        setShowCelebration(true)
+        window.setTimeout(() => setShowCelebration(false), 1800)
+      }
+      return next
+    })
+  }
+
   function selectDay(dayIndex: number) {
     if (dayIndex > 2) return
     setSelectedDay(dayIndex)
@@ -114,11 +127,13 @@ export default function Page() {
                 const dayKey = relativeDay + 2 + weekOffset * 7
                 const isSelected = selectedDay === dayKey
                 const isFuture = date > today
-                const hasHistory = history[dayKey]?.some((habit) => habit.completed)
+                const dayHabits = history[dayKey]
+                const hasHistory = dayHabits?.some((habit) => habit.completed)
+                const completedAll = Boolean(dayHabits?.length && dayHabits.every((habit) => habit.completed))
                 return (
                   <button key={date.toISOString()} onClick={() => selectDay(dayKey)} disabled={isFuture} aria-label={`View ${label} ${date.getDate()}`} className={`flex animate-[habit-add_260ms_ease-out] flex-col items-center gap-1.5 ${isFuture ? 'cursor-not-allowed opacity-35' : ''}`}>
-                    <span className="text-[10px] font-medium uppercase text-[#999995]">{label}</span>
-                    <span className={`grid size-8 place-items-center rounded-full text-xs font-semibold transition-all ${isSelected ? 'text-white shadow-[0_3px_8px_rgba(0,0,0,0.18)]' : hasHistory ? 'bg-[#dededb] text-[#555550]' : 'text-[#999995] hover:bg-[#e8e8e5]'}`} style={isSelected ? { backgroundColor: 'var(--theme-color)' } : undefined}>{date.getDate()}</span>
+                    <span className="text-[10px] font-medium text-[#999995]">{label}</span>
+                    <span className={`grid size-8 place-items-center rounded-full text-xs font-semibold transition-all ${isSelected ? 'text-white shadow-[0_3px_8px_rgba(0,0,0,0.18)]' : completedAll ? 'bg-[var(--theme-color)]/15 text-[var(--theme-color)] ring-1 ring-[var(--theme-color)]/25' : hasHistory ? 'bg-[#dededb] text-[#555550]' : 'text-[#999995] hover:bg-[#e8e8e5]'}`} style={isSelected ? { backgroundColor: 'var(--theme-color)' } : undefined}>{date.getDate()}</span>
                   </button>
                 )
               })}
@@ -154,7 +169,10 @@ export default function Page() {
         <section className="flex-1 px-6 pb-6 pt-7">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold tracking-tight">Today&apos;s habits</h2>
-            <span className="text-[11px] font-medium text-[#999995]">{habits.length} total</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-medium text-[#999995]">{habits.length} total</span>
+              <button onClick={toggleAllHabits} aria-label={completed === habits.length ? 'Uncheck all habits' : 'Check all habits'} className="rounded-lg border border-[#e1e1dd] px-2 py-1 text-[10px] font-semibold text-[#777771] transition-colors hover:border-[#111] hover:bg-white hover:text-[#111] active:scale-95">{completed === habits.length ? 'Clear' : 'Check all'}</button>
+            </div>
           </div>
           <div className="space-y-2.5">
             {habits.map((habit) => (
