@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
-import { Bell, BellOff, Check, ChevronLeft, ChevronRight, Plus, Trash2, X } from 'lucide-react'
+import { Bell, BellOff, Check, ChevronLeft, ChevronRight, Palette, Plus, Trash2, X } from 'lucide-react'
 
 const initialHabits = [
   { id: 1, name: 'Drink water', detail: '8 glasses', completed: true },
@@ -30,6 +30,7 @@ export default function Page() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [showCelebration, setShowCelebration] = useState(false)
   const [themeIndex, setThemeIndex] = useState(0)
+  const [isThemePickerOpen, setIsThemePickerOpen] = useState(false)
 
   const completed = habits.filter((habit) => habit.completed).length
   const progress = habits.length ? Math.round((completed / habits.length) * 100) : 0
@@ -95,7 +96,7 @@ export default function Page() {
         <header className="flex items-center justify-between px-6 pb-5 pt-7">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#858581]">{formatDate(visibleDays.find((day) => day.relativeDay + weekOffset * 7 === selectedDay - 2)?.date ?? today)}</p>
-            <h1 className="mt-1 flex items-center gap-2 text-[28px] font-semibold tracking-[-0.05em]">{greeting}, Alex. <button onClick={() => setThemeIndex((index) => (index + 1) % themeColors.length)} aria-label="Change theme color" className="size-3.5 rounded-full border-2 border-white shadow-[0_0_0_1px_#bbb] transition-transform hover:scale-125" style={{ backgroundColor: themeColors[themeIndex] }} /></h1>
+            <h1 className="mt-1 flex items-center gap-2 text-[28px] font-semibold tracking-[-0.05em]"><span className="relative inline-flex items-center"><button onClick={() => setIsThemePickerOpen((open) => !open)} aria-label="Open theme color palette" aria-expanded={isThemePickerOpen} className="grid size-6 place-items-center rounded-full text-[#777771] transition-colors hover:bg-[#ededeb] hover:text-[#111]"><Palette size={14} strokeWidth={2.25} /></button>{isThemePickerOpen && <div role="dialog" aria-label="Theme color palette" className="absolute left-0 top-8 z-40 flex gap-2 rounded-2xl border border-[#e5e5e1] bg-white p-2.5 shadow-[0_12px_30px_rgba(0,0,0,0.14)]">{themeColors.map((color, index) => <button key={color} onClick={() => { setThemeIndex(index); setIsThemePickerOpen(false) }} aria-label={`Choose theme color ${index + 1}`} aria-pressed={themeIndex === index} className={`size-6 rounded-full border-2 transition-transform hover:scale-110 ${themeIndex === index ? 'border-[#111] scale-110' : 'border-white shadow-[0_0_0_1px_#d1d1cc]'}`} style={{ backgroundColor: color }} />)}</div>}</span><span>{greeting}, Alex.</span></h1>
           </div>
           <div className="flex items-center gap-1">
             <button onClick={goToToday} aria-label="Go to today" className={`rounded-full px-2.5 py-1.5 text-[10px] font-semibold transition-all ${selectedDay === 2 ? 'pointer-events-none opacity-0' : 'text-[#777771] hover:bg-[#ededeb] hover:text-[#111]'}`}>Today</button>
