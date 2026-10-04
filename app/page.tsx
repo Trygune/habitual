@@ -1,0 +1,127 @@
+'use client'
+
+import { useMemo, useState } from 'react'
+import { Check, ChevronLeft, ChevronRight, MoreHorizontal, Plus, Trash2 } from 'lucide-react'
+
+const initialHabits = [
+  { id: 1, name: 'Drink water', detail: '8 glasses', completed: true },
+  { id: 2, name: 'Morning stretch', detail: '10 minutes', completed: true },
+  { id: 3, name: 'Read a book', detail: '20 pages', completed: false },
+  { id: 4, name: 'Walk outside', detail: '30 minutes', completed: false },
+]
+
+const days = [
+  { label: 'M', date: '12', state: 'done' },
+  { label: 'T', date: '13', state: 'done' },
+  { label: 'W', date: '14', state: 'today' },
+  { label: 'T', date: '15', state: 'upcoming' },
+  { label: 'F', date: '16', state: 'upcoming' },
+  { label: 'S', date: '17', state: 'upcoming' },
+  { label: 'S', date: '18', state: 'upcoming' },
+]
+
+export default function Page() {
+  const [habits, setHabits] = useState(initialHabits)
+  const [newHabit, setNewHabit] = useState('')
+  const [isAdding, setIsAdding] = useState(false)
+  const [removingId, setRemovingId] = useState<number | null>(null)
+
+  const completed = habits.filter((habit) => habit.completed).length
+  const progress = habits.length ? Math.round((completed / habits.length) * 100) : 0
+  const greeting = useMemo(() => (new Date().getHours() < 12 ? 'Good morning' : 'Good day'), [])
+
+  function toggleHabit(id: number) {
+    setHabits((current) => current.map((habit) => habit.id === id ? { ...habit, completed: !habit.completed } : habit))
+  }
+
+  function addHabit() {
+    const name = newHabit.trim()
+    if (!name) return
+    setHabits((current) => [...current, { id: Date.now(), name, detail: 'Daily habit', completed: false }])
+    setNewHabit('')
+    setIsAdding(false)
+  }
+
+  function removeHabit(id: number) {
+    setRemovingId(id)
+    window.setTimeout(() => {
+      setHabits((current) => current.filter((habit) => habit.id !== id))
+      setRemovingId(null)
+    }, 260)
+  }
+
+  return (
+    <main className="min-h-screen bg-[#ededeb] px-4 py-5 text-[#111111] sm:py-8">
+      <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-[430px] flex-col overflow-hidden rounded-[2rem] bg-[#f8f8f6] shadow-[0_24px_80px_rgba(0,0,0,0.12)] sm:min-h-[780px]">
+        <header className="flex items-center justify-between px-6 pb-5 pt-7">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#858581]">Wednesday, May 14</p>
+            <h1 className="mt-1 text-[28px] font-semibold tracking-[-0.05em]">{greeting}, Alex.</h1>
+          </div>
+          <button aria-label="More options" className="grid size-10 place-items-center rounded-full border border-[#dededb] bg-white transition-transform hover:scale-105 active:scale-95">
+            <MoreHorizontal size={19} strokeWidth={2} />
+          </button>
+        </header>
+
+        <section className="px-6" aria-label="Week overview">
+          <div className="flex items-center justify-between border-y border-[#e2e2df] py-4">
+            <button aria-label="Previous week" className="text-[#8a8a86] transition-colors hover:text-black"><ChevronLeft size={18} /></button>
+            <div className="flex flex-1 justify-around">
+              {days.map((day) => (
+                <div key={`${day.label}-${day.date}`} className="flex flex-col items-center gap-1.5">
+                  <span className="text-[10px] font-medium uppercase text-[#999995]">{day.label}</span>
+                  <span className={`grid size-8 place-items-center rounded-full text-xs font-semibold ${day.state === 'today' ? 'bg-[#111] text-white shadow-[0_3px_8px_rgba(0,0,0,0.18)]' : day.state === 'done' ? 'bg-[#dededb] text-[#555550]' : 'text-[#999995]'}`}>{day.date}</span>
+                </div>
+              ))}
+            </div>
+            <button aria-label="Next week" className="text-[#8a8a86] transition-colors hover:text-black"><ChevronRight size={18} /></button>
+          </div>
+        </section>
+
+        <section className="mx-6 mt-6 rounded-2xl bg-[#111111] p-5 text-white" aria-label="Daily progress">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs text-white/55">Your daily progress</p>
+              <p className="mt-1 text-[26px] font-semibold tracking-[-0.04em]">{completed} <span className="text-base font-normal text-white/45">of {habits.length} habits</span></p>
+            </div>
+            <span className="text-2xl font-light tracking-[-0.05em]">{progress}%</span>
+          </div>
+          <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-white/15"><div className="h-full rounded-full bg-white transition-all duration-500 ease-out" style={{ width: `${progress}%` }} /></div>
+          <p className="mt-3 text-[11px] text-white/45">Small steps, every day.</p>
+        </section>
+
+        <section className="flex-1 px-6 pb-6 pt-7">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold tracking-tight">Today&apos;s habits</h2>
+            <span className="text-[11px] font-medium text-[#999995]">{habits.length} total</span>
+          </div>
+          <div className="space-y-2.5">
+            {habits.map((habit) => (
+              <div key={habit.id} className={`habit-row group flex items-center gap-3 rounded-2xl border border-[#e5e5e1] bg-white p-3.5 transition-all duration-300 ${removingId === habit.id ? 'habit-removing' : ''}`}>
+                <button onClick={() => toggleHabit(habit.id)} aria-label={`${habit.completed ? 'Mark' : 'Complete'} ${habit.name}`} className={`grid size-9 shrink-0 place-items-center rounded-full border transition-all duration-300 ${habit.completed ? 'border-[#111] bg-[#111] text-white' : 'border-[#d6d6d1] bg-white text-transparent hover:border-[#111]'}`}>
+                  <Check size={16} strokeWidth={2.5} />
+                </button>
+                <button onClick={() => toggleHabit(habit.id)} className="min-w-0 flex-1 text-left">
+                  <p className={`truncate text-sm font-medium transition-colors ${habit.completed ? 'text-[#8e8e89] line-through' : 'text-[#171714]'}`}>{habit.name}</p>
+                  <p className="mt-0.5 text-[11px] text-[#a0a09b]">{habit.detail}</p>
+                </button>
+                <button onClick={() => removeHabit(habit.id)} aria-label={`Remove ${habit.name}`} className="grid size-8 place-items-center rounded-full text-[#c0c0bb] opacity-0 transition-all hover:bg-[#f1f1ef] hover:text-[#111] group-hover:opacity-100 focus-visible:opacity-100"><Trash2 size={15} /></button>
+              </div>
+            ))}
+          </div>
+
+          {isAdding ? (
+            <div className="habit-add mt-3 flex items-center gap-2 rounded-2xl border border-[#111] bg-white p-2">
+              <input autoFocus value={newHabit} onChange={(event) => setNewHabit(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.nativeEvent.isComposing && event.keyCode !== 229) addHabit(); if (event.key === 'Escape') setIsAdding(false) }} placeholder="Name your new habit" className="min-w-0 flex-1 bg-transparent px-2 text-sm outline-none placeholder:text-[#aaa]" />
+              <button onClick={addHabit} className="rounded-xl bg-[#111] px-3 py-2 text-xs font-semibold text-white transition-transform active:scale-95">Add</button>
+            </div>
+          ) : (
+            <button onClick={() => setIsAdding(true)} className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-[#d4d4cf] py-3.5 text-xs font-semibold text-[#777771] transition-all hover:border-[#111] hover:bg-white hover:text-[#111] active:scale-[0.98]"><Plus size={15} /> Add a habit</button>
+          )}
+        </section>
+        <footer className="border-t border-[#e5e5e1] px-6 py-4 text-center text-[10px] font-medium uppercase tracking-[0.18em] text-[#aaa9a4]">Build your better days</footer>
+      </div>
+    </main>
+  )
+}
+
