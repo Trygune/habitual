@@ -171,6 +171,12 @@
 
 .habit-add { animation: habit-add 260ms cubic-bezier(0.22, 1, 0.36, 1); }
 .habit-removing { animation: habit-remove 260ms ease-in forwards; overflow: hidden; }
+.habit-done { animation: habit-done 420ms cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes habit-done {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.025); }
+  100% { transform: scale(1); }
+}
 .habit-complete { animation: habit-complete 700ms cubic-bezier(0.22, 1, 0.36, 1); }
 .celebration-dot { animation: celebration-dot 900ms ease-out forwards; }
 @keyframes celebration-dot {

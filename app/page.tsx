@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { Bell, BellOff, Check, ChevronLeft, ChevronRight, Plus, Trash2, X } from 'lucide-react'
 
 const initialHabits = [
@@ -25,11 +25,19 @@ export default function Page() {
   const [history, setHistory] = useState<Record<number, typeof initialHabits>>({ 2: initialHabits })
   const [selectedDay, setSelectedDay] = useState(2)
   const [newHabit, setNewHabit] = useState('')
+  const [newDetail, setNewDetail] = useState('')
   const [isAdding, setIsAdding] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const [removingId, setRemovingId] = useState<number | null>(null)
   const [weekOffset, setWeekOffset] = useState(0)
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [showCelebration, setShowCelebration] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 80)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   const completed = habits.filter((habit) => habit.completed).length
   const progress = habits.length ? Math.round((completed / habits.length) * 100) : 0
@@ -48,16 +56,23 @@ export default function Page() {
   }
 
   function selectDay(dayIndex: number) {
+    if (dayIndex > 2) return
     setSelectedDay(dayIndex)
     setHabits(history[dayIndex] ?? initialHabits.map((habit) => ({ ...habit, completed: false })))
     setIsAdding(false)
   }
 
+  function goToToday() {
+    setWeekOffset(0)
+    selectDay(2)
+  }
+
   function addHabit() {
     const name = newHabit.trim()
     if (!name) return
-    setHabits((current) => [...current, { id: Date.now(), name, detail: 'Daily habit', completed: false }])
+    setHabits((current) => [...current, { id: Date.now(), name, detail: newDetail.trim() || 'Daily habit', completed: false }])
     setNewHabit('')
+    setNewDetail('')
     setIsAdding(false)
   }
 
@@ -77,9 +92,12 @@ export default function Page() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#858581]">{selectedDay === 0 ? 'Wednesday, May 14' : `Day ${selectedDay > 0 ? 'after' : 'before'} May 14`}</p>
             <h1 className="mt-1 text-[28px] font-semibold tracking-[-0.05em]">{greeting}, Alex.</h1>
           </div>
-          <button onClick={() => setNotificationsEnabled((enabled) => !enabled)} aria-label={notificationsEnabled ? 'Mute notifications' : 'Unmute notifications'} className="grid size-10 place-items-center rounded-full border border-[#dededb] bg-white transition-transform hover:scale-105 active:scale-95">
-            {notificationsEnabled ? <Bell size={18} strokeWidth={2} /> : <BellOff size={18} strokeWidth={2} className="text-[#999995]" />}
-          </button>
+          <div className="flex items-center gap-1">
+            <button onClick={goToToday} aria-label="Go to today" className={`rounded-full px-2.5 py-1.5 text-[10px] font-semibold transition-all ${selectedDay === 2 ? 'pointer-events-none opacity-0' : 'text-[#777771] hover:bg-[#ededeb] hover:text-[#111]'}`}>Today</button>
+            <button onClick={() => setNotificationsEnabled((enabled) => !enabled)} aria-label={notificationsEnabled ? 'Mute notifications' : 'Unmute notifications'} className="grid size-10 place-items-center rounded-full text-[#555550] transition-transform hover:bg-[#ededeb] hover:scale-105 active:scale-95">
+              {notificationsEnabled ? <Bell size={18} strokeWidth={2} /> : <BellOff size={18} strokeWidth={2} className="text-[#999995]" />}
+            </button>
+          </div>
         </header>
 
         <section className="px-6" aria-label="Week overview">
@@ -89,9 +107,10 @@ export default function Page() {
               {days.map((day, index) => {
                 const dayKey = weekOffset * 7 + index
                 const isSelected = selectedDay === dayKey
+                const isFuture = dayKey > 2
                 const hasHistory = history[dayKey]?.some((habit) => habit.completed)
                 return (
-                  <button key={`${weekOffset}-${day.label}-${day.date}`} onClick={() => selectDay(dayKey)} aria-label={`View ${day.label} ${Number(day.date) + weekOffset * 7}`} className="flex animate-[habit-add_260ms_ease-out] flex-col items-center gap-1.5">
+                  <button key={`${weekOffset}-${day.label}-${day.date}`} onClick={() => selectDay(dayKey)} disabled={isFuture} aria-label={`View ${day.label} ${Number(day.date) + weekOffset * 7}`} className={`flex animate-[habit-add_260ms_ease-out] flex-col items-center gap-1.5 ${isFuture ? 'cursor-not-allowed opacity-35' : ''}`}>
                     <span className="text-[10px] font-medium uppercase text-[#999995]">{day.label}</span>
                     <span className={`grid size-8 place-items-center rounded-full text-xs font-semibold transition-all ${isSelected ? 'bg-[#111] text-white shadow-[0_3px_8px_rgba(0,0,0,0.18)]' : hasHistory ? 'bg-[#dededb] text-[#555550]' : 'text-[#999995] hover:bg-[#e8e8e5]'}`}>{Number(day.date) + weekOffset * 7}</span>
                   </button>
@@ -102,20 +121,20 @@ export default function Page() {
           </div>
         </section>
 
-        <section className={`relative mx-6 mt-6 rounded-2xl bg-[#111111] p-5 text-white ${showCelebration ? 'habit-complete' : ''}`} aria-label="Daily progress">
+        <section className={`relative mx-6 mt-6 rounded-2xl bg-[#111111] text-white transition-all duration-500 ${isScrolled ? 'p-3' : 'p-5'} ${showCelebration ? 'habit-complete' : ''}`} aria-label="Daily progress">
           {showCelebration && <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl" aria-label="All habits complete">
             {[...Array(8)].map((_, index) => <span key={index} className="celebration-dot absolute left-1/2 top-1/2 size-1.5 rounded-full bg-white" style={{ '--end': `translate(${Math.cos(index * 0.8) * 90}px, ${Math.sin(index * 0.8) * 55}px)` } as CSSProperties} />)}
             <p className="absolute inset-x-0 top-3 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-white/70">All done</p>
           </div>}
-          <div className="flex items-start justify-between">
-            <div>
+          <div className={`flex items-center justify-between transition-all duration-500 ${isScrolled ? 'gap-3' : 'items-start'}`}>
+            <div className={isScrolled ? 'flex items-center gap-2' : ''}>
               <p className="text-xs text-white/55">Your daily progress</p>
-              <p className="mt-1 text-[26px] font-semibold tracking-[-0.04em]">{completed} <span className="text-base font-normal text-white/45">of {habits.length} habits</span></p>
+              <p className={`${isScrolled ? 'mt-0 text-sm' : 'mt-1 text-[26px]'} font-semibold tracking-[-0.04em]`}>{completed} <span className={`${isScrolled ? 'text-xs' : 'text-base'} font-normal text-white/45`}>of {habits.length}</span></p>
             </div>
-            <span className="text-2xl font-light tracking-[-0.05em]">{progress}%</span>
+            <span className={`${isScrolled ? 'text-sm' : 'text-2xl'} font-light tracking-[-0.05em]`}>{progress}%</span>
           </div>
-          <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-white/15"><div className="h-full rounded-full bg-white transition-all duration-500 ease-out" style={{ width: `${progress}%` }} /></div>
-          <p className="mt-3 text-[11px] text-white/45">Small steps, every day.</p>
+          <div className={`${isScrolled ? 'mt-2' : 'mt-5'} h-1.5 overflow-hidden rounded-full bg-white/15`}><div className="h-full rounded-full bg-white transition-all duration-500 ease-out" style={{ width: `${progress}%` }} /></div>
+          {!isScrolled && <p className="mt-3 text-[11px] text-white/45">Small steps, every day.</p>}
         </section>
 
         <section className="flex-1 px-6 pb-6 pt-7">
@@ -125,7 +144,7 @@ export default function Page() {
           </div>
           <div className="space-y-2.5">
             {habits.map((habit) => (
-              <div key={habit.id} className={`habit-row group flex items-center gap-3 rounded-2xl border border-[#e5e5e1] bg-white p-3.5 transition-all duration-300 ${removingId === habit.id ? 'habit-removing' : ''}`}>
+              <div key={habit.id} className={`habit-row group flex items-center gap-3 rounded-2xl border border-[#e5e5e1] bg-white p-3.5 transition-all duration-300 ${removingId === habit.id ? 'habit-removing' : ''} ${habit.completed ? 'habit-done' : ''}`}>
                 <button onClick={() => toggleHabit(habit.id)} aria-label={`${habit.completed ? 'Mark' : 'Complete'} ${habit.name}`} className={`grid size-9 shrink-0 place-items-center rounded-full border transition-all duration-300 ${habit.completed ? 'border-[#111] bg-[#111] text-white' : 'border-[#d6d6d1] bg-white text-transparent hover:border-[#111]'}`}>
                   <Check size={16} strokeWidth={2.5} />
                 </button>
@@ -139,10 +158,13 @@ export default function Page() {
           </div>
 
           {isAdding ? (
-            <div className="habit-add mt-3 flex items-center gap-2 rounded-2xl border border-[#111] bg-white p-2">
-              <input autoFocus value={newHabit} onChange={(event) => setNewHabit(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.nativeEvent.isComposing && event.keyCode !== 229) addHabit(); if (event.key === 'Escape') setIsAdding(false) }} placeholder="Name your new habit" className="min-w-0 flex-1 bg-transparent px-2 text-sm outline-none placeholder:text-[#aaa]" />
-              <button onClick={addHabit} className="rounded-xl bg-[#111] px-3 py-2 text-xs font-semibold text-white transition-transform active:scale-95">Add</button>
-              <button onClick={() => { setIsAdding(false); setNewHabit('') }} aria-label="Cancel adding habit" className="grid size-9 place-items-center rounded-xl text-[#999995] transition-colors hover:bg-[#f1f1ef] hover:text-[#111] active:scale-95"><X size={16} /></button>
+            <div className="habit-add mt-3 flex flex-col gap-2 rounded-2xl border border-[#111] bg-white p-2">
+              <input autoFocus value={newHabit} onChange={(event) => setNewHabit(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.nativeEvent.isComposing && event.keyCode !== 229) addHabit(); if (event.key === 'Escape') setIsAdding(false) }} placeholder="Name your new habit" className="w-full bg-transparent px-2 pt-1 text-sm outline-none placeholder:text-[#aaa]" />
+              <input value={newDetail} onChange={(event) => setNewDetail(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.nativeEvent.isComposing && event.keyCode !== 229) addHabit(); if (event.key === 'Escape') setIsAdding(false) }} placeholder="Add a detail (e.g. 20 minutes)" className="w-full border-t border-[#eeeeeb] bg-transparent px-2 pt-2 text-xs outline-none placeholder:text-[#aaa]" />
+              <div className="flex justify-end gap-2 pt-1">
+                <button onClick={() => { setIsAdding(false); setNewHabit(''); setNewDetail('') }} className="rounded-xl px-3 py-2 text-xs font-semibold text-[#777771] transition-colors hover:bg-[#f1f1ef] hover:text-[#111]">Cancel</button>
+                <button onClick={addHabit} className="rounded-xl bg-[#111] px-3 py-2 text-xs font-semibold text-white transition-transform active:scale-95">Add</button>
+              </div>
             </div>
           ) : (
             <button onClick={() => setIsAdding(true)} className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-[#d4d4cf] py-3.5 text-xs font-semibold text-[#777771] transition-all hover:border-[#111] hover:bg-white hover:text-[#111] active:scale-[0.98]"><Plus size={15} /> Add a habit</button>
