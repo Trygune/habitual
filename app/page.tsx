@@ -10,15 +10,12 @@ const initialHabits = [
   { id: 4, name: 'Walk outside', detail: '30 minutes', completed: false },
 ]
 
-const days = [
-  { label: 'M', date: '12', state: 'done' },
-  { label: 'T', date: '13', state: 'done' },
-  { label: 'W', date: '14', state: 'today' },
-  { label: 'T', date: '15', state: 'upcoming' },
-  { label: 'F', date: '16', state: 'upcoming' },
-  { label: 'S', date: '17', state: 'upcoming' },
-  { label: 'S', date: '18', state: 'upcoming' },
-]
+const calendarDays = Array.from({ length: 7 }, (_, index) => index - 2)
+const themeColors = ['#111111', '#315c4b', '#3f4d78', '#754b37']
+
+function formatDate(date: Date) {
+  return new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(date)
+}
 
 export default function Page() {
   const [habits, setHabits] = useState(initialHabits)
@@ -32,6 +29,7 @@ export default function Page() {
   const [weekOffset, setWeekOffset] = useState(0)
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [showCelebration, setShowCelebration] = useState(false)
+  const [themeIndex, setThemeIndex] = useState(0)
 
   const completed = habits.filter((habit) => habit.completed).length
   const progress = habits.length ? Math.round((completed / habits.length) * 100) : 0
@@ -78,13 +76,26 @@ export default function Page() {
     }, 260)
   }
 
+  useEffect(() => {
+    const onWindowScroll = () => setIsScrolled(window.scrollY > 80)
+    window.addEventListener('scroll', onWindowScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onWindowScroll)
+  }, [])
+
+  const today = new Date()
+  const visibleDays = calendarDays.map((relativeDay) => {
+    const date = new Date(today)
+    date.setDate(today.getDate() + relativeDay + weekOffset * 7)
+    return { relativeDay, date, label: new Intl.DateTimeFormat('en-US', { weekday: 'narrow' }).format(date) }
+  })
+
   return (
-    <main onScroll={(event) => setIsScrolled(event.currentTarget.scrollTop > 80)} className="min-h-screen overflow-y-auto bg-[#ededeb] px-4 py-5 text-[#111111] sm:py-8">
+    <main onScrollCapture={(event) => { const target = event.target as HTMLElement; setIsScrolled(target.scrollTop > 80 || window.scrollY > 80) }} style={{ '--theme-color': themeColors[themeIndex] } as CSSProperties} className="min-h-screen overflow-y-auto bg-[#ededeb] px-4 py-5 text-[#111111] sm:py-8">
       <div className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col overscroll-contain rounded-[2rem] bg-[#f8f8f6] shadow-[0_24px_80px_rgba(0,0,0,0.12)]">
         <header className="flex items-center justify-between px-6 pb-5 pt-7">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#858581]">{selectedDay === 0 ? 'Wednesday, May 14' : `Day ${selectedDay > 0 ? 'after' : 'before'} May 14`}</p>
-            <h1 className="mt-1 text-[28px] font-semibold tracking-[-0.05em]">{greeting}, Alex.</h1>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#858581]">{formatDate(visibleDays.find((day) => day.relativeDay + weekOffset * 7 === selectedDay - 2)?.date ?? today)}</p>
+            <h1 className="mt-1 flex items-center gap-2 text-[28px] font-semibold tracking-[-0.05em]">{greeting}, Alex. <button onClick={() => setThemeIndex((index) => (index + 1) % themeColors.length)} aria-label="Change theme color" className="size-3.5 rounded-full border-2 border-white shadow-[0_0_0_1px_#bbb] transition-transform hover:scale-125" style={{ backgroundColor: themeColors[themeIndex] }} /></h1>
           </div>
           <div className="flex items-center gap-1">
             <button onClick={goToToday} aria-label="Go to today" className={`rounded-full px-2.5 py-1.5 text-[10px] font-semibold transition-all ${selectedDay === 2 ? 'pointer-events-none opacity-0' : 'text-[#777771] hover:bg-[#ededeb] hover:text-[#111]'}`}>Today</button>
@@ -98,15 +109,15 @@ export default function Page() {
           <div className="flex items-center justify-between border-y border-[#e2e2df] py-4">
             <button aria-label="Previous week" onClick={() => setWeekOffset((value) => value - 1)} className="text-[#8a8a86] transition-colors hover:text-black active:scale-90"><ChevronLeft size={18} /></button>
             <div className="flex flex-1 justify-around overflow-hidden" aria-live="polite">
-              {days.map((day, index) => {
-                const dayKey = weekOffset * 7 + index
+              {visibleDays.map(({ relativeDay, date, label }) => {
+                const dayKey = relativeDay + 2 + weekOffset * 7
                 const isSelected = selectedDay === dayKey
-                const isFuture = dayKey > 2
+                const isFuture = date > today
                 const hasHistory = history[dayKey]?.some((habit) => habit.completed)
                 return (
-                  <button key={`${weekOffset}-${day.label}-${day.date}`} onClick={() => selectDay(dayKey)} disabled={isFuture} aria-label={`View ${day.label} ${Number(day.date) + weekOffset * 7}`} className={`flex animate-[habit-add_260ms_ease-out] flex-col items-center gap-1.5 ${isFuture ? 'cursor-not-allowed opacity-35' : ''}`}>
-                    <span className="text-[10px] font-medium uppercase text-[#999995]">{day.label}</span>
-                    <span className={`grid size-8 place-items-center rounded-full text-xs font-semibold transition-all ${isSelected ? 'bg-[#111] text-white shadow-[0_3px_8px_rgba(0,0,0,0.18)]' : hasHistory ? 'bg-[#dededb] text-[#555550]' : 'text-[#999995] hover:bg-[#e8e8e5]'}`}>{Number(day.date) + weekOffset * 7}</span>
+                  <button key={date.toISOString()} onClick={() => selectDay(dayKey)} disabled={isFuture} aria-label={`View ${label} ${date.getDate()}`} className={`flex animate-[habit-add_260ms_ease-out] flex-col items-center gap-1.5 ${isFuture ? 'cursor-not-allowed opacity-35' : ''}`}>
+                    <span className="text-[10px] font-medium uppercase text-[#999995]">{label}</span>
+                    <span className={`grid size-8 place-items-center rounded-full text-xs font-semibold transition-all ${isSelected ? 'text-white shadow-[0_3px_8px_rgba(0,0,0,0.18)]' : hasHistory ? 'bg-[#dededb] text-[#555550]' : 'text-[#999995] hover:bg-[#e8e8e5]'}`} style={isSelected ? { backgroundColor: 'var(--theme-color)' } : undefined}>{date.getDate()}</span>
                   </button>
                 )
               })}
@@ -115,7 +126,7 @@ export default function Page() {
           </div>
         </section>
 
-        <section className={`sticky top-0 z-20 relative mx-6 mt-6 rounded-2xl bg-[#111111] text-white shadow-[0_10px_24px_rgba(0,0,0,0.08)] transition-all duration-500 ${isScrolled ? 'p-3' : 'p-5'} ${showCelebration ? 'habit-complete' : ''}`} aria-label="Daily progress">
+        <section style={{ backgroundColor: 'var(--theme-color)' }} className={`sticky top-0 z-20 relative mx-6 mt-6 rounded-2xl text-white shadow-[0_10px_24px_rgba(0,0,0,0.08)] transition-all duration-500 ${isScrolled ? 'p-3' : 'p-5'} ${showCelebration ? 'habit-complete' : ''}`} aria-label="Daily progress">
           {showCelebration && <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl" aria-label="All habits complete">
             {[...Array(8)].map((_, index) => <span key={index} className="celebration-dot absolute left-1/2 top-1/2 size-1.5 rounded-full bg-white" style={{ '--end': `translate(${Math.cos(index * 0.8) * 90}px, ${Math.sin(index * 0.8) * 55}px)` } as CSSProperties} />)}
             <p className="absolute inset-x-0 top-3 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-white/70">All done</p>
