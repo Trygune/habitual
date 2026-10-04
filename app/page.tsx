@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState, type CSSProperties } from 'react'
-import { Check, ChevronLeft, ChevronRight, MoreHorizontal, Plus, Trash2, X } from 'lucide-react'
+import { Bell, BellOff, Check, ChevronLeft, ChevronRight, Plus, Trash2, X } from 'lucide-react'
 
 const initialHabits = [
   { id: 1, name: 'Drink water', detail: '8 glasses', completed: true },
@@ -22,10 +22,13 @@ const days = [
 
 export default function Page() {
   const [habits, setHabits] = useState(initialHabits)
+  const [history, setHistory] = useState<Record<number, typeof initialHabits>>({ 2: initialHabits })
+  const [selectedDay, setSelectedDay] = useState(2)
   const [newHabit, setNewHabit] = useState('')
   const [isAdding, setIsAdding] = useState(false)
   const [removingId, setRemovingId] = useState<number | null>(null)
   const [weekOffset, setWeekOffset] = useState(0)
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [showCelebration, setShowCelebration] = useState(false)
 
   const completed = habits.filter((habit) => habit.completed).length
@@ -35,12 +38,19 @@ export default function Page() {
   function toggleHabit(id: number) {
     setHabits((current) => {
       const next = current.map((habit) => habit.id === id ? { ...habit, completed: !habit.completed } : habit)
+      setHistory((saved) => ({ ...saved, [selectedDay]: next }))
       if (next.length > 0 && next.every((habit) => habit.completed) && !current.every((habit) => habit.completed)) {
         setShowCelebration(true)
         window.setTimeout(() => setShowCelebration(false), 1800)
       }
       return next
     })
+  }
+
+  function selectDay(dayIndex: number) {
+    setSelectedDay(dayIndex)
+    setHabits(history[dayIndex] ?? initialHabits.map((habit) => ({ ...habit, completed: false })))
+    setIsAdding(false)
   }
 
   function addHabit() {
@@ -64,11 +74,11 @@ export default function Page() {
       <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-[430px] flex-col overflow-hidden rounded-[2rem] bg-[#f8f8f6] shadow-[0_24px_80px_rgba(0,0,0,0.12)] sm:min-h-[780px]">
         <header className="flex items-center justify-between px-6 pb-5 pt-7">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#858581]">Wednesday, May 14</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#858581]">{selectedDay === 0 ? 'Wednesday, May 14' : `Day ${selectedDay > 0 ? 'after' : 'before'} May 14`}</p>
             <h1 className="mt-1 text-[28px] font-semibold tracking-[-0.05em]">{greeting}, Alex.</h1>
           </div>
-          <button aria-label="More options" className="grid size-10 place-items-center rounded-full border border-[#dededb] bg-white transition-transform hover:scale-105 active:scale-95">
-            <MoreHorizontal size={19} strokeWidth={2} />
+          <button onClick={() => setNotificationsEnabled((enabled) => !enabled)} aria-label={notificationsEnabled ? 'Mute notifications' : 'Unmute notifications'} className="grid size-10 place-items-center rounded-full border border-[#dededb] bg-white transition-transform hover:scale-105 active:scale-95">
+            {notificationsEnabled ? <Bell size={18} strokeWidth={2} /> : <BellOff size={18} strokeWidth={2} className="text-[#999995]" />}
           </button>
         </header>
 
@@ -76,12 +86,17 @@ export default function Page() {
           <div className="flex items-center justify-between border-y border-[#e2e2df] py-4">
             <button aria-label="Previous week" onClick={() => setWeekOffset((value) => value - 1)} className="text-[#8a8a86] transition-colors hover:text-black active:scale-90"><ChevronLeft size={18} /></button>
             <div className="flex flex-1 justify-around overflow-hidden" aria-live="polite">
-              {days.map((day) => (
-                <div key={`${weekOffset}-${day.label}-${day.date}`} className="flex animate-[habit-add_260ms_ease-out] flex-col items-center gap-1.5">
-                  <span className="text-[10px] font-medium uppercase text-[#999995]">{day.label}</span>
-                  <span className={`grid size-8 place-items-center rounded-full text-xs font-semibold ${day.state === 'today' && weekOffset === 0 ? 'bg-[#111] text-white shadow-[0_3px_8px_rgba(0,0,0,0.18)]' : day.state === 'done' && weekOffset === 0 ? 'bg-[#dededb] text-[#555550]' : 'text-[#999995]'}`}>{Number(day.date) + weekOffset * 7}</span>
-                </div>
-              ))}
+              {days.map((day, index) => {
+                const dayKey = weekOffset * 7 + index
+                const isSelected = selectedDay === dayKey
+                const hasHistory = history[dayKey]?.some((habit) => habit.completed)
+                return (
+                  <button key={`${weekOffset}-${day.label}-${day.date}`} onClick={() => selectDay(dayKey)} aria-label={`View ${day.label} ${Number(day.date) + weekOffset * 7}`} className="flex animate-[habit-add_260ms_ease-out] flex-col items-center gap-1.5">
+                    <span className="text-[10px] font-medium uppercase text-[#999995]">{day.label}</span>
+                    <span className={`grid size-8 place-items-center rounded-full text-xs font-semibold transition-all ${isSelected ? 'bg-[#111] text-white shadow-[0_3px_8px_rgba(0,0,0,0.18)]' : hasHistory ? 'bg-[#dededb] text-[#555550]' : 'text-[#999995] hover:bg-[#e8e8e5]'}`}>{Number(day.date) + weekOffset * 7}</span>
+                  </button>
+                )
+              })}
             </div>
             <button aria-label="Next week" onClick={() => setWeekOffset((value) => value + 1)} className="text-[#8a8a86] transition-colors hover:text-black active:scale-90"><ChevronRight size={18} /></button>
           </div>
