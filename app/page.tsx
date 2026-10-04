@@ -33,12 +33,6 @@ export default function Page() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [showCelebration, setShowCelebration] = useState(false)
 
-  useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 80)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
   const completed = habits.filter((habit) => habit.completed).length
   const progress = habits.length ? Math.round((completed / habits.length) * 100) : 0
   const greeting = useMemo(() => (new Date().getHours() < 12 ? 'Good morning' : 'Good day'), [])
@@ -85,8 +79,8 @@ export default function Page() {
   }
 
   return (
-    <main className="min-h-screen bg-[#ededeb] px-4 py-5 text-[#111111] sm:py-8">
-      <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-[430px] flex-col overflow-hidden rounded-[2rem] bg-[#f8f8f6] shadow-[0_24px_80px_rgba(0,0,0,0.12)] sm:min-h-[780px]">
+    <main className="h-screen overflow-hidden bg-[#ededeb] px-4 py-5 text-[#111111] sm:py-8">
+      <div onScroll={(event) => setIsScrolled(event.currentTarget.scrollTop > 80)} className="mx-auto flex h-full w-full max-w-[430px] flex-col overflow-y-auto overscroll-contain rounded-[2rem] bg-[#f8f8f6] shadow-[0_24px_80px_rgba(0,0,0,0.12)]">
         <header className="flex items-center justify-between px-6 pb-5 pt-7">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#858581]">{selectedDay === 0 ? 'Wednesday, May 14' : `Day ${selectedDay > 0 ? 'after' : 'before'} May 14`}</p>
@@ -121,7 +115,7 @@ export default function Page() {
           </div>
         </section>
 
-        <section className={`relative mx-6 mt-6 rounded-2xl bg-[#111111] text-white transition-all duration-500 ${isScrolled ? 'p-3' : 'p-5'} ${showCelebration ? 'habit-complete' : ''}`} aria-label="Daily progress">
+        <section className={`sticky top-0 z-20 relative mx-6 mt-6 rounded-2xl bg-[#111111] text-white shadow-[0_10px_24px_rgba(0,0,0,0.08)] transition-all duration-500 ${isScrolled ? 'p-3' : 'p-5'} ${showCelebration ? 'habit-complete' : ''}`} aria-label="Daily progress">
           {showCelebration && <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl" aria-label="All habits complete">
             {[...Array(8)].map((_, index) => <span key={index} className="celebration-dot absolute left-1/2 top-1/2 size-1.5 rounded-full bg-white" style={{ '--end': `translate(${Math.cos(index * 0.8) * 90}px, ${Math.sin(index * 0.8) * 55}px)` } as CSSProperties} />)}
             <p className="absolute inset-x-0 top-3 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-white/70">All done</p>
