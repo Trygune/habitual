@@ -79,8 +79,8 @@ export default function Page() {
   }
 
   return (
-    <main className="h-screen overflow-hidden bg-[#ededeb] px-4 py-5 text-[#111111] sm:py-8">
-      <div onScroll={(event) => setIsScrolled(event.currentTarget.scrollTop > 80)} className="mx-auto flex h-full w-full max-w-[430px] flex-col overflow-y-auto overscroll-contain rounded-[2rem] bg-[#f8f8f6] shadow-[0_24px_80px_rgba(0,0,0,0.12)]">
+    <main onScroll={(event) => setIsScrolled(event.currentTarget.scrollTop > 80)} className="min-h-screen overflow-y-auto bg-[#ededeb] px-4 py-5 text-[#111111] sm:py-8">
+      <div className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col overscroll-contain rounded-[2rem] bg-[#f8f8f6] shadow-[0_24px_80px_rgba(0,0,0,0.12)]">
         <header className="flex items-center justify-between px-6 pb-5 pt-7">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#858581]">{selectedDay === 0 ? 'Wednesday, May 14' : `Day ${selectedDay > 0 ? 'after' : 'before'} May 14`}</p>
@@ -120,15 +120,23 @@ export default function Page() {
             {[...Array(8)].map((_, index) => <span key={index} className="celebration-dot absolute left-1/2 top-1/2 size-1.5 rounded-full bg-white" style={{ '--end': `translate(${Math.cos(index * 0.8) * 90}px, ${Math.sin(index * 0.8) * 55}px)` } as CSSProperties} />)}
             <p className="absolute inset-x-0 top-3 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-white/70">All done</p>
           </div>}
-          <div className={`flex items-center justify-between transition-all duration-500 ${isScrolled ? 'gap-3' : 'items-start'}`}>
-            <div className={isScrolled ? 'flex items-center gap-2' : ''}>
-              <p className="text-xs text-white/55">Your daily progress</p>
-              <p className={`${isScrolled ? 'mt-0 text-sm' : 'mt-1 text-[26px]'} font-semibold tracking-[-0.04em]`}>{completed} <span className={`${isScrolled ? 'text-xs' : 'text-base'} font-normal text-white/45`}>of {habits.length}</span></p>
+          {isScrolled ? (
+            <div className="h-1 overflow-hidden rounded-full bg-white/15" aria-label={`${progress}% complete`}>
+              <div className="h-full rounded-full bg-white transition-[width] duration-500 ease-out" style={{ width: `${progress}%` }} />
             </div>
-            <span className={`${isScrolled ? 'text-sm' : 'text-2xl'} font-light tracking-[-0.05em]`}>{progress}%</span>
-          </div>
-          <div className={`${isScrolled ? 'mt-2' : 'mt-5'} h-1.5 overflow-hidden rounded-full bg-white/15`}><div className="h-full rounded-full bg-white transition-all duration-500 ease-out" style={{ width: `${progress}%` }} /></div>
-          {!isScrolled && <p className="mt-3 text-[11px] text-white/45">Small steps, every day.</p>}
+          ) : (
+            <>
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs text-white/55">Your daily progress</p>
+                  <p className="mt-1 text-[26px] font-semibold tracking-[-0.04em]">{completed} <span className="text-base font-normal text-white/45">of {habits.length}</span></p>
+                </div>
+                <span className="text-2xl font-light tracking-[-0.05em]">{progress}%</span>
+              </div>
+              <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-white/15"><div className="h-full rounded-full bg-white transition-[width] duration-500 ease-out" style={{ width: `${progress}%` }} /></div>
+              <p className="mt-3 text-[11px] text-white/45">Small steps, every day.</p>
+            </>
+          )}
         </section>
 
         <section className="flex-1 px-6 pb-6 pt-7">
