@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { Plus } from "lucide-react";
 import ProgressBar from "@/components/shared/ProgressBar/ProgressBar";
 import Footer from "@/components/layout/Footer/Footer";
@@ -15,21 +15,47 @@ import { HabitProps } from "@/types/habit";
 const App = () => {
   const [habits, setHabits] = useState<HabitProps[]>([]);
   const [history, setHistory] = useState<Record<number, HabitProps[]>>({});
-  const [selectedDay, setSelectedDay] = useState(2);
   const [isAdding, setIsAdding] = useState(false);
-  const [weekOffset, setWeekOffset] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
   const [themeIndex, setThemeIndex] = useState(0);
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date>(
+    new Date(new Date().setHours(0, 0, 0, 0)),
+  );
+  const historyDateId = date.getTime();
 
   const completed = habits.filter((habit) => habit.completed).length;
 
-  const selectDay = (dayIndex: number) => {
-    if (dayIndex > 2) return;
-    setSelectedDay(dayIndex);
-    setHabits(history[dayIndex] ?? []);
+  useEffect(() => {
+    setHabits(
+      history[historyDateId] ??
+        habits.map((habit) => ({ ...habit, completed: false })),
+    );
     setIsAdding(false);
-  };
+  }, [date]);
+
+  useEffect(() => {
+    if (!isAdding) return;
+
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [isAdding]);
+
+  useEffect(() => {
+    setHistory((saved) => {
+      const updated = { ...saved };
+
+      if (habits.length === 0) {
+        if (saved[historyDateId]) {
+          delete updated[historyDateId];
+        }
+        return updated;
+      }
+
+      return { ...saved, [historyDateId]: habits };
+    });
+  }, [habits]);
 
   return (
     <main
@@ -38,22 +64,12 @@ const App = () => {
     >
       <div className="mx-auto flex min-h-screen w-full max-w-md flex-col overscroll-contain bg-[#f8f8f6] shadow-[0_24px_80px_rgba(0,0,0,0.12)]">
         <Header
-          setWeekOffset={setWeekOffset}
-          selectDay={selectDay}
           themeIndex={themeIndex}
           setThemeIndex={setThemeIndex}
-          selectedDay={selectedDay}
           date={date}
           setDate={setDate}
         />
-        <HabitCalender
-          weekOffset={weekOffset}
-          setWeekOffset={setWeekOffset}
-          selectedDay={selectedDay}
-          history={history}
-          selectDay={selectDay}
-          today={date}
-        />
+        <HabitCalender history={history} setDate={setDate} chosenDate={date} />
         <ProgressBar
           showCelebration={showCelebration}
           habitsLength={habits.length}
@@ -64,9 +80,7 @@ const App = () => {
           <HabitList
             habits={habits}
             setHabits={setHabits}
-            setHistory={setHistory}
             setShowCelebration={setShowCelebration}
-            selectedDay={selectedDay}
             completed={completed}
           />
 

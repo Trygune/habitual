@@ -5,28 +5,13 @@ import Notifications from "./Notifications";
 import ThemePicker from "./ThemePicker";
 
 interface HeaderProps {
-  setWeekOffset: (offset: number) => void;
-  selectDay: (day: number) => void;
   themeIndex: number;
   setThemeIndex: (index: number) => void;
-  selectedDay: number;
-  date: Date | undefined;
-  setDate: (d: Date | undefined) => void;
+  date: Date;
+  setDate: (d: Date) => void;
 }
 
-const Header = ({
-  setWeekOffset,
-  selectDay,
-  themeIndex,
-  setThemeIndex,
-  selectedDay,
-  date,
-  setDate,
-}: HeaderProps) => {
-  const goToToday = () => {
-    setWeekOffset(0);
-    selectDay(2);
-  };
+const Header = ({ themeIndex, setThemeIndex, date, setDate }: HeaderProps) => {
   return (
     <header className="px-5 pb-5 mt-7">
       <HeaderDate date={date} setDate={setDate} />
@@ -41,7 +26,7 @@ const Header = ({
           </div>
         </div>
         <div className="flex items-center gap-0.5">
-          <GoToday goToToday={goToToday} selectedDay={selectedDay} />
+          <GoToday goToToday={setDate} date={date} />
           <Notifications />
         </div>
       </div>

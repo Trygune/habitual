@@ -1,23 +1,27 @@
 import { Button } from "@/components/ui/button";
+import { HabitProps } from "@/types/habit";
 import { cn } from "cn";
 import { Check, Trash2 } from "lucide-react";
 import { useState } from "react";
 
+interface HabitItemProps {
+  habit: HabitProps;
+  setHabits: (n: (h: HabitProps[]) => HabitProps[]) => void;
+  setShowCelebration: (c: boolean) => void;
+}
+
 const HabitItem = ({
   habit,
   setHabits,
-  setHistory,
   setShowCelebration,
-  selectedDay,
-}) => {
+}: HabitItemProps) => {
   const [removingId, setRemovingId] = useState<number | null>(null);
 
-  function toggleHabit(id: number) {
+  const toggleHabit = (id: number) => {
     setHabits((current) => {
       const next = current.map((habit) =>
         habit.id === id ? { ...habit, completed: !habit.completed } : habit,
       );
-      setHistory((saved) => ({ ...saved, [selectedDay]: next }));
       if (
         next.length > 0 &&
         next.every((habit) => habit.completed) &&
@@ -28,15 +32,15 @@ const HabitItem = ({
       }
       return next;
     });
-  }
+  };
 
-  function removeHabit(id: number) {
+  const removeHabit = (id: number) => {
     setRemovingId(id);
     window.setTimeout(() => {
       setHabits((current) => current.filter((habit) => habit.id !== id));
       setRemovingId(null);
     }, 260);
-  }
+  };
 
   return (
     <div

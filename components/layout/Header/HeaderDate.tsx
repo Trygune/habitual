@@ -10,10 +10,16 @@ import { ChevronDownIcon } from "lucide-react";
 
 interface HeaderDateProps {
   date: Date | undefined;
-  setDate: (d: Date | undefined) => void;
+  setDate: (d: Date) => void;
 }
 
 const HeaderDate = ({ date, setDate }: HeaderDateProps) => {
+  const choseDate = (time: Date | undefined) => {
+    if (time) return setDate(time);
+
+    return setDate(new Date(new Date().setHours(0, 0, 0, 0)));
+  };
+
   return (
     <Popover>
       <PopoverTrigger
@@ -32,7 +38,7 @@ const HeaderDate = ({ date, setDate }: HeaderDateProps) => {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={(time) => choseDate(time)}
           defaultMonth={date}
         />
       </PopoverContent>

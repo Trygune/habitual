@@ -8,37 +8,32 @@ import EmptyState from "../EmptyState/EmptyState";
 interface HabitListProps {
   habits: HabitProps[];
   setHabits: (n: (h: HabitProps[]) => HabitProps[]) => void;
-  setHistory: (
-    n: (r: Record<number, HabitProps[]>) => Record<number, HabitProps[]>,
-  ) => void;
   setShowCelebration: (b: boolean) => void;
-  selectedDay: number;
   completed: number;
 }
 
 const HabitList = ({
   habits,
   setHabits,
-  setHistory,
   setShowCelebration,
-  selectedDay,
   completed,
 }: HabitListProps) => {
-  function toggleAllHabits() {
+  const toggleAllHabits = () => {
     setHabits((current) => {
       const shouldComplete = current.some((habit) => !habit.completed);
       const next = current.map((habit) => ({
         ...habit,
         completed: shouldComplete,
       }));
-      setHistory((saved) => ({ ...saved, [selectedDay]: next }));
+
       if (shouldComplete && next.length > 0) {
         setShowCelebration(true);
         window.setTimeout(() => setShowCelebration(false), 1800);
       }
       return next;
     });
-  }
+  };
+
   return (
     <>
       <div className="mb-3 flex items-center justify-between">
@@ -81,9 +76,7 @@ const HabitList = ({
               key={habit.id}
               habit={habit}
               setHabits={setHabits}
-              setHistory={setHistory}
               setShowCelebration={setShowCelebration}
-              selectedDay={selectedDay}
             />
           ))}
         </div>

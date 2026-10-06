@@ -3,8 +3,7 @@ import { HabitProps } from "@/types/habit";
 import { cn } from "cn";
 
 interface CalenderDayProps {
-  selectDay: (n: number) => void;
-  dayKey: number;
+  handleSelectDate: (d: Date) => void;
   index: number;
   daysLength: number;
   date: Date;
@@ -17,13 +16,12 @@ interface CalenderDayProps {
 }
 
 const CalenderDay = ({
-  dayKey,
   date,
   label,
   index,
   isFuture,
   isSelected,
-  selectDay,
+  handleSelectDate,
   daysLength,
   hasHistory,
   completedAll,
@@ -31,7 +29,7 @@ const CalenderDay = ({
   return (
     <>
       <button
-        onClick={() => selectDay(dayKey)}
+        onClick={() => handleSelectDate(date)}
         disabled={isFuture}
         aria-label={`View ${label} ${date.getDate()}`}
         className={cn(
