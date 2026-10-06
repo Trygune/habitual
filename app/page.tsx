@@ -11,6 +11,7 @@ import { themeColors } from "@/components/layout/Header/ThemePicker";
 import AddHabit from "@/components/shared/AddHabit/AddHabit";
 import { Button } from "@/components/ui/button";
 import { HabitProps } from "@/types/habit";
+import { cn } from "cn";
 
 const App = () => {
   const [habits, setHabits] = useState<HabitProps[]>([]);
@@ -24,6 +25,8 @@ const App = () => {
   const historyDateId = date.getTime();
 
   const completed = habits.filter((habit) => habit.completed).length;
+
+  const isFuture = date > new Date();
 
   useEffect(() => {
     setHabits(
@@ -70,13 +73,21 @@ const App = () => {
           setDate={setDate}
         />
         <HabitCalender history={history} setDate={setDate} chosenDate={date} />
-        <ProgressBar
-          showCelebration={showCelebration}
-          habitsLength={habits.length}
-          completed={completed}
-        />
 
-        <section className="flex-1 px-6 pb-6 pt-7">
+        <section className={cn(isFuture && "pointer-events-none opacity-50")}>
+          <ProgressBar
+            showCelebration={showCelebration}
+            habitsLength={habits.length}
+            completed={completed}
+          />
+        </section>
+
+        <section
+          className={cn(
+            "flex-1 px-6 pb-6 pt-7",
+            isFuture && "pointer-events-none opacity-50",
+          )}
+        >
           <HabitList
             habits={habits}
             setHabits={setHabits}

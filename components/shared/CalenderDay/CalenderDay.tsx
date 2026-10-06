@@ -37,7 +37,7 @@ const CalenderDay = ({
           isFuture && "cursor-not-allowed opacity-35",
         )}
       >
-        <span className="text-[10px] font-medium text-[#999995]">{label}</span>
+        <span className="text-[10px] font-medium text-[#747474]">{label}</span>
         <span
           className={cn(
             "grid size-6 place-items-center rounded-full text-xs font-semibold transition-all",
@@ -47,7 +47,7 @@ const CalenderDay = ({
                 ? "bg-(--theme-color)/15 text-(--theme-color) ring-1 ring-(--theme-color)/50"
                 : hasHistory
                   ? "bg-[#dededb] text-[#555550]"
-                  : "text-[#999995] hover:bg-[#e8e8e5]",
+                  : "text-[#747474] hover:bg-[#e8e8e5]",
           )}
           style={
             isSelected ? { backgroundColor: "var(--theme-color)" } : undefined
