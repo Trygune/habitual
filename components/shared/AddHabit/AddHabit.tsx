@@ -35,7 +35,7 @@ const AddHabit = ({ setHabits, setIsAdding }: AddHabitProps) => {
   };
 
   return (
-    <div className="habit-add mt-3 flex flex-col gap-1.5 rounded-2xl border border-[#111] bg-white px-2 py-2.5">
+    <div className="habit-add mt-3 flex flex-col gap-1.5 rounded-2xl border border-[#111] bg-[#f8f8f6] dark:border-[#f8f8f6] dark:bg-[#111] px-2 py-2.5">
       <Input
         autoFocus
         value={newHabit}
@@ -46,7 +46,7 @@ const AddHabit = ({ setHabits, setIsAdding }: AddHabitProps) => {
           if (event.key === "Escape") setIsAdding(false);
         }}
         placeholder="Name your new habit"
-        className="w-full bg-transparent font-normal focus-visible:ring-0 border-none placeholder:text-[#aaa]"
+        className="w-full bg-transparent font-normal focus-visible:ring-0 border-none placeholder:text-[#aaa] dark:placeholder:text-[#b6b6b6]"
       />
       <Separator />
       <Input
@@ -58,21 +58,21 @@ const AddHabit = ({ setHabits, setIsAdding }: AddHabitProps) => {
           if (event.key === "Escape") setIsAdding(false);
         }}
         placeholder="Add a detail (e.g. 20 minutes)"
-        className="w-full bg-transparent font-light focus-visible:ring-0 border-none placeholder:text-[#aaa]"
+        className="w-full bg-transparent font-light focus-visible:ring-0 border-none placeholder:text-[#aaa] dark:placeholder:text-[#b6b6b6]"
       />
       <div className="flex justify-end gap-2 mt-1.5">
         <Button
           onClick={cancelNewHabit}
           variant="ghost"
           size="sm"
-          className="rounded-xl text-xs font-semibold text-[#777771] transition-colors hover:bg-[#f1f1ef] hover:text-[#111]"
+          className="rounded-xl text-xs font-semibold text-gray-500 transition-colors hover:bg-[#f1f1ef] hover:text-[#111] dark:text-gray-300 dark:hover:bg-[#1b1b1b] dark:hover:text-[#f1f1ef]"
         >
           Cancel
         </Button>
         <Button
           onClick={addNewHabit}
           size="sm"
-          className="rounded-xl bg-[#111] text-xs font-semibold text-white transition-transform active:scale-95"
+          className="rounded-xl bg-[#111] text-xs font-semibold text-[#f8f8f6] transition-transform active:scale-95 dark:bg-[#f8f8f6] dark:text-[#111]"
         >
           Add
         </Button>

@@ -37,21 +37,18 @@ const CalenderDay = ({
           isFuture && "cursor-not-allowed opacity-35",
         )}
       >
-        <span className="text-[10px] font-medium text-[#747474]">{label}</span>
+        <span className="text-[10px] font-medium text-gray-400">{label}</span>
         <span
           className={cn(
             "grid size-6 place-items-center rounded-full text-xs font-semibold transition-all",
             isSelected
-              ? "text-white shadow-[0_3px_8px_rgba(0,0,0,0.18)]"
+              ? "text-[#f8f8f6] bg-[#111] dark:text-[#111] dark:bg-gray-200 shadow-[0_3px_8px_rgba(0,0,0,0.18)]"
               : completedAll
-                ? "bg-(--theme-color)/15 text-(--theme-color) ring-1 ring-(--theme-color)/50"
+                ? "bg-[#111]/15 text-[#111] ring-1 ring-[#111]/50 dark:bg-[#f8f8f6]/15 dark:text-[#f8f8f6] dark:ring-[#f8f8f6]/50"
                 : hasHistory
-                  ? "bg-[#dededb] text-[#555550]"
-                  : "text-[#747474] hover:bg-[#e8e8e5]",
+                  ? "bg-[#dededb] text-gray-500 dark:bg-[#f8f8f6]/20 dark:text-gray-200"
+                  : "text-gray-400 hover:bg-[#e8e8e5] dark:hover:bg-[#2c2c2c]",
           )}
-          style={
-            isSelected ? { backgroundColor: "var(--theme-color)" } : undefined
-          }
         >
           {date.getDate()}
         </span>
@@ -60,7 +57,7 @@ const CalenderDay = ({
         <Separator
           orientation="vertical"
           className={cn(
-            "my-auto h-12",
+            "my-auto h-12 text-gray-400",
             Math.min(index, daysLength - 2 - index) === 0 && "h-8",
             Math.min(index, daysLength - 2 - index) === 1 && "h-10",
           )}

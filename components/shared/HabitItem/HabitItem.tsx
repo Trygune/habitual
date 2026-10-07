@@ -45,7 +45,11 @@ const HabitItem = ({
   return (
     <div
       key={habit.id}
-      className={`habit-row group flex items-center gap-3 rounded-2xl border border-[#e5e5e1] bg-white p-3.5 transition-all duration-300 ${removingId === habit.id ? "habit-removing" : ""} ${habit.completed ? "habit-done" : ""}`}
+      className={cn(
+        "habit-row group flex items-center gap-3 rounded-2xl border border-gray-200 bg-[#f8f8f6] dark:bg-[#111] dark:border-gray-500 p-3.5 transition-all duration-300",
+        removingId === habit.id && "habit-removing",
+        habit.completed && "habit-done",
+      )}
     >
       <Button
         onClick={() => toggleHabit(habit.id)}
@@ -54,8 +58,8 @@ const HabitItem = ({
         className={cn(
           "grid size-9 shrink-0 place-items-center rounded-full transition-all duration-300",
           habit.completed
-            ? "border-[#111] bg-[#111] text-white hover:bg-[#111] hover:text-white"
-            : "border-[#d6d6d1] bg-white text-transparent hover:border-[#111] hover:text-[#111]",
+            ? "border-[#111] bg-[#111] text-[#f8f8f6] hover:bg-[#111] hover:text-[#f8f8f6] dark:border-[#f8f8f6] dark:bg-gray-200 dark:text-[#111] dark:hover:bg-[#f8f8f6] dark:hover:text-[#111]"
+            : "border-[#d6d6d1] bg-[#f8f8f6] text-transparent hover:border-[#111] hover:text-[#111] dark:border-[#5a5a5a] dark:bg-[#111] dark:hover:border-[#f8f8f6] dark:hover:text-[#f8f8f6]",
         )}
       >
         <Check size={16} strokeWidth={2.5} />
@@ -65,18 +69,23 @@ const HabitItem = ({
         className="min-w-0 flex-1 text-left cursor-pointer"
       >
         <p
-          className={`truncate text-sm font-medium transition-colors ${habit.completed ? "text-[#8e8e89] line-through" : "text-[#171714]"}`}
+          className={cn(
+            "truncate text-sm font-medium transition-colors text-[#171714] dark:text-[#e7e7cb]",
+            habit.completed && "text-gray-400 dark:text-gray-300 line-through",
+          )}
         >
           {habit.name}
         </p>
-        <p className="mt-0.5 text-[11px] text-[#a0a09b]">{habit.detail}</p>
+        <p className="mt-0.5 text-[11px] text-gray-400 dark:text-gray-300">
+          {habit.detail}
+        </p>
       </div>
       <Button
         onClick={() => removeHabit(habit.id)}
         aria-label={`Remove ${habit.name}`}
         variant="ghost"
         size="icon"
-        className="grid place-items-center rounded-full text-[#c0c0bb] opacity-0 transition-all hover:bg-[#f1f1ef] hover:text-[#111] group-hover:opacity-100 focus-visible:opacity-100"
+        className="grid place-items-center rounded-full text-gray-400 dark:text-gray-200 transition-all hover:text-[#111] dark:hover:text-[#f8f8f6]"
       >
         <Trash2 size={15} />
       </Button>

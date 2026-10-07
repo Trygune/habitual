@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Check, X } from "lucide-react";
 import { HabitProps } from "@/types/habit";
 import EmptyState from "../EmptyState/EmptyState";
+import { cn } from "cn";
 
 interface HabitListProps {
   habits: HabitProps[];
@@ -36,14 +37,19 @@ const HabitList = ({
 
   return (
     <>
-      <div className="mb-3 flex items-center justify-between">
+      <div
+        className={cn(
+          "mb-1 flex items-center justify-between",
+          habits.length !== 0 && "mb-2.5",
+        )}
+      >
         <h2 className="text-sm font-semibold tracking-tight">
           Today&apos;s habits
         </h2>
         <div className="flex items-center gap-2">
           <Badge
             variant="ghost"
-            className="text-[11px] font-medium text-[#999995]"
+            className="text-[11px] font-medium text-gray-400"
           >
             {habits.length} total
           </Badge>
@@ -57,7 +63,7 @@ const HabitList = ({
               }
               variant="ghost"
               size="xs"
-              className="text-[10px] border border-[#e1e1dd] font-semibold text-[#777771] transition-colors hover:border-[#111] active:scale-95"
+              className="text-[10px] border border-gray-300 font-semibold text-gray-500 transition-colors hover:border-[#111] active:scale-95 dark:border-gray-400 dark:text-gray-300 dark:hover:border-[#f8f8f6]"
             >
               {completed === habits.length ? "Clear" : "Check all"}
               {completed === habits.length ? (

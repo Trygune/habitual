@@ -13,7 +13,7 @@ const Notifications = () => {
       aria-label={
         notificationsEnabled ? "Mute notifications" : "Unmute notifications"
       }
-      className="grid place-items-center rounded-full text-[#555550] transition-transform hover:bg-[#ededeb] hover:scale-105 active:scale-95"
+      className="grid place-items-center rounded-full text-gray-500 transition-transform hover:bg-[#ededeb] hover:text-[#111] hover:scale-105 active:scale-95 dark:text-gray-300 dark:hover:bg-[#202020] dark:hover:text-[#f8f8f6]"
     >
       {notificationsEnabled ? (
         <Bell strokeWidth={2} />

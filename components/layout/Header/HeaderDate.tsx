@@ -27,19 +27,23 @@ const HeaderDate = ({ date, setDate }: HeaderDateProps) => {
           <Button
             variant="ghost"
             data-empty={!date}
-            className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#858581] text-left data-[empty=true]:text-muted-foreground"
+            className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#858581] dark:text-[#aaaaa6] text-left data-[empty=true]:text-muted-foreground px-0.5"
           >
             {date && formatDate(date)}
             <ChevronDownIcon data-icon="inline-end" />
           </Button>
         }
       />
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent
+        className="w-auto p-0 bg-[#f8f8f6] dark:bg-[#111]"
+        align="start"
+      >
         <Calendar
           mode="single"
           selected={date}
           onSelect={(time) => choseDate(time)}
           defaultMonth={date}
+          weekStartsOn={6}
         />
       </PopoverContent>
     </Popover>

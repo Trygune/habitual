@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import ThemeProvider from "@/providers/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "Habit — Build better days",
@@ -38,8 +39,10 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <html lang="en">
-      <body className="antialiased">{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className="antialiased">
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 };

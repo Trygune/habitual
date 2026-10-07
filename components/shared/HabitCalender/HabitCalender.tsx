@@ -44,19 +44,19 @@ const HabitCalender = ({
   };
 
   return (
-    <section className="px-5" aria-label="Week overview">
-      <div className="flex items-center justify-between py-2.5">
+    <section aria-label="Week overview">
+      <div className="flex items-center justify-between">
         <Button
           aria-label="Previous week"
           variant="ghost"
           size="icon"
           onClick={() => setWeekOffset((value) => value - 1)}
-          className="text-[#8a8a86] transition-colors hover:text-black active:scale-90"
+          className="text-gray-400 transition-colors hover:text-[#111] dark:hover:text-[#f8f8f6] active:scale-90"
         >
           <ChevronLeft size={18} />
         </Button>
         <div
-          className="flex flex-1 justify-around overflow-hidden"
+          className="flex flex-1 justify-around overflow-hidden pb-2"
           aria-live="polite"
         >
           {visibleDays.map(({ date, label }, index) => {
@@ -91,7 +91,7 @@ const HabitCalender = ({
           variant="ghost"
           size="icon"
           onClick={() => setWeekOffset((value) => value + 1)}
-          className="text-[#8a8a86] transition-colors hover:text-black active:scale-90"
+          className="text-gray-400 transition-colors hover:text-[#111] dark:hover:text-[#f8f8f6] active:scale-90"
         >
           <ChevronRight size={18} />
         </Button>

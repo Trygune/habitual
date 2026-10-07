@@ -62,10 +62,10 @@ const App = () => {
 
   return (
     <main
-      style={{ "--theme-color": themeColors[themeIndex] } as CSSProperties}
-      className="min-h-screen overflow-y-auto bg-[#ededeb] text-[#111111] sm:py-8"
+      // style={{ "--theme-color": themeColors[themeIndex] } as CSSProperties}
+      className="min-h-screen overflow-y-auto bg-[#ededeb] text-[#111] dark:bg-[#111] dark:text-[#ededeb]"
     >
-      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col overscroll-contain bg-[#f8f8f6] shadow-[0_24px_80px_rgba(0,0,0,0.12)]">
+      <div className="mx-auto px-5 gap-y-5 flex min-h-screen w-full max-w-md flex-col overscroll-contain bg-[#f8f8f6] dark:bg-[#111] shadow-[0_24px_80px_rgba(0,0,0,0.12)]">
         <Header
           themeIndex={themeIndex}
           setThemeIndex={setThemeIndex}
@@ -83,10 +83,7 @@ const App = () => {
         </section>
 
         <section
-          className={cn(
-            "flex-1 px-6 pb-6 pt-7",
-            isFuture && "pointer-events-none opacity-50",
-          )}
+          className={cn("flex-1", isFuture && "pointer-events-none opacity-50")}
         >
           <HabitList
             habits={habits}
@@ -102,7 +99,7 @@ const App = () => {
               onClick={() => setIsAdding(true)}
               variant="ghost"
               size="lg"
-              className="mt-3 w-full rounded-2xl border border-dashed border-[#d4d4cf] text-xs font-semibold text-[#777771] transition-all hover:border-[#111] active:scale-[0.98]"
+              className="mt-2.5 w-full rounded-2xl border border-dashed border-[#d4d4cf] text-xs font-semibold text-[#777771] transition-all hover:border-[#111] dark:hover:border-[#f8f8f6] active:scale-[0.98]"
             >
               <Plus size={15} data-icon="inline-start" />
               Add a habit
