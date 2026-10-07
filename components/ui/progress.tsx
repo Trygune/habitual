@@ -17,8 +17,8 @@ function Progress({
       {...props}
     >
       {children}
-      <ProgressTrack className={"bg-[#f8f8f6]/20 dark:bg-[#111]/20"}>
-        <ProgressIndicator className={"bg-[#f8f8f6] dark:bg-[#111]"} />
+      <ProgressTrack className={"bg-[#111]/20 dark:bg-[#f8f8f6]/20"}>
+        <ProgressIndicator className={"bg-[#111] dark:bg-[#f8f8f6]"} />
       </ProgressTrack>
     </ProgressPrimitive.Root>
   );
