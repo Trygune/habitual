@@ -2,21 +2,22 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import CalenderDay from "../CalenderDay/CalenderDay";
 import { HabitProps } from "@/types/habit";
-import { useState } from "react";
 
 interface HabitCalenderProps {
   chosenDate: Date;
   history: Record<number, HabitProps[]>;
-  setDate: (d: Date) => void;
+  weekOffset: number;
+  setWeekOffset: (d: (n: number) => number) => void;
+  handleSelectDate: (d: Date) => void;
 }
 
 const HabitCalender = ({
   history,
-  setDate,
+  weekOffset,
   chosenDate,
+  setWeekOffset,
+  handleSelectDate,
 }: HabitCalenderProps) => {
-  const [weekOffset, setWeekOffset] = useState(0);
-
   // Start of the week (Saturday)
   const calendarDays = Array.from({ length: 7 }, (_, index) => index);
 
@@ -37,11 +38,6 @@ const HabitCalender = ({
       ),
     };
   });
-
-  const handleSelectDate = (date: Date) => {
-    setDate(date);
-    setWeekOffset(() => 0);
-  };
 
   return (
     <section aria-label="Week overview">

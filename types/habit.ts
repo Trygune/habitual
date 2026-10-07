@@ -4,3 +4,8 @@ export interface HabitProps {
   detail: string;
   completed: boolean;
 }
+
+export type HistoryProps = {
+  id: number;
+  habits: HabitProps[];
+};
