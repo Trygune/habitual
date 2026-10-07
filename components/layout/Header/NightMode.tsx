@@ -1,15 +1,36 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
-import { Button } from "../../ui/button";
 import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
 
 const NightMode = () => {
   const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Button
+        variant="ghost"
+        className="grid size-10 place-items-center"
+        aria-label="Toggle theme"
+      >
+        <Moon strokeWidth={2.25} />
+      </Button>
+    );
+  }
 
   return (
     <Button
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
       variant="ghost"
-      className="grid size-6 place-items-center rounded-full transition-colors text-gray-500 hover:bg-[#ededeb] hover:text-[#111] hover:scale-105 dark:text-gray-300 dark:hover:bg-[#202020] dark:hover:text-[#f8f8f6]"
+      className="grid size-10 place-items-center text-gray-500 dark:text-gray-300"
+      aria-label="Toggle theme"
     >
       {resolvedTheme === "dark" ? (
         <Sun strokeWidth={2.25} />

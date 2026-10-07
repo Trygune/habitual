@@ -1,18 +1,23 @@
 "use client";
 
-import { ThemeProvider as NextThemeProvider } from "next-themes";
+import {
+  ThemeProvider as NextThemeProvider,
+  type ThemeProviderProps,
+} from "next-themes";
 
-interface Props {
-  children: React.ReactNode;
-}
+const ThemeProvider = ({ children }: ThemeProviderProps) => {
+  const scriptProps =
+    typeof window === "undefined"
+      ? undefined
+      : ({ type: "application/json" } as const);
 
-const ThemeProvider = ({ children }: Props) => {
   return (
     <NextThemeProvider
       attribute="class"
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
+      scriptProps={scriptProps}
     >
       {children}
     </NextThemeProvider>
