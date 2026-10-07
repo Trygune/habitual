@@ -1,13 +1,14 @@
 import { Button } from "@/components/ui/button";
+import { deleteHabit, getHabit, updateHabit } from "@/services/habit.service";
 import { HabitProps } from "@/types/habit";
 import { cn } from "cn";
 import { Check, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 interface HabitItemProps {
   habit: HabitProps;
-  setHabits: (n: (h: HabitProps[]) => HabitProps[]) => void;
-  setShowCelebration: (c: boolean) => void;
+  setHabits: Dispatch<SetStateAction<HabitProps[]>>;
+  setShowCelebration: Dispatch<SetStateAction<boolean>>;
 }
 
 const HabitItem = ({
@@ -17,10 +18,21 @@ const HabitItem = ({
 }: HabitItemProps) => {
   const [removingId, setRemovingId] = useState<number | null>(null);
 
-  const toggleHabit = (id: number) => {
+  const toggleHabit = async (id: number) => {
+    const habit = await getHabit(id);
+
+    if (!habit) return;
+
+    const updatedHabit = {
+      ...habit,
+      completed: !habit.completed,
+    };
+
+    await updateHabit(updatedHabit);
+
     setHabits((current) => {
       const next = current.map((habit) =>
-        habit.id === id ? { ...habit, completed: !habit.completed } : habit,
+        habit.id === id ? updatedHabit : habit,
       );
       if (
         next.length > 0 &&
@@ -34,7 +46,13 @@ const HabitItem = ({
     });
   };
 
-  const removeHabit = (id: number) => {
+  const removeHabit = async (id: number) => {
+    const habit = await getHabit(id);
+
+    if (!habit) return;
+
+    await deleteHabit(id);
+
     setRemovingId(id);
     window.setTimeout(() => {
       setHabits((current) => current.filter((habit) => habit.id !== id));

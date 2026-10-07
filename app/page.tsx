@@ -11,6 +11,7 @@ import AddHabit from "@/components/shared/AddHabit/AddHabit";
 import { Button } from "@/components/ui/button";
 import { HabitProps } from "@/types/habit";
 import { cn } from "cn";
+import { getHabits } from "@/services/habit.service";
 
 const App = () => {
   const [habits, setHabits] = useState<HabitProps[]>([]);
@@ -31,6 +32,16 @@ const App = () => {
     setDate(date);
     setWeekOffset(() => 0);
   };
+
+  useEffect(() => {
+    const loadHabits = async () => {
+      const storedHabits = await getHabits();
+
+      setHabits(storedHabits);
+    };
+
+    loadHabits();
+  }, []);
 
   useEffect(() => {
     setHabits(

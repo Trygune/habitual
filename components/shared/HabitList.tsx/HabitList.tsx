@@ -5,11 +5,13 @@ import { Check, X } from "lucide-react";
 import { HabitProps } from "@/types/habit";
 import EmptyState from "../EmptyState/EmptyState";
 import { cn } from "cn";
+import { getHabits, updateHabits } from "@/services/habit.service";
+import { Dispatch, SetStateAction } from "react";
 
 interface HabitListProps {
   habits: HabitProps[];
-  setHabits: (n: (h: HabitProps[]) => HabitProps[]) => void;
-  setShowCelebration: (b: boolean) => void;
+  setHabits: Dispatch<SetStateAction<HabitProps[]>>;
+  setShowCelebration: Dispatch<SetStateAction<boolean>>;
   completed: number;
 }
 
@@ -19,20 +21,25 @@ const HabitList = ({
   setShowCelebration,
   completed,
 }: HabitListProps) => {
-  const toggleAllHabits = () => {
-    setHabits((current) => {
-      const shouldComplete = current.some((habit) => !habit.completed);
-      const next = current.map((habit) => ({
-        ...habit,
-        completed: shouldComplete,
-      }));
+  const toggleAllHabits = async () => {
+    const habits = await getHabits();
 
-      if (shouldComplete && next.length > 0) {
-        setShowCelebration(true);
-        window.setTimeout(() => setShowCelebration(false), 1800);
-      }
-      return next;
-    });
+    if (habits.length === 0) return;
+
+    const shouldComplete = habits.some((habit) => !habit.completed);
+    const next = habits.map((habit) => ({
+      ...habit,
+      completed: shouldComplete,
+    }));
+
+    await updateHabits(next);
+
+    setHabits(next);
+
+    if (shouldComplete && next.length > 0) {
+      setShowCelebration(true);
+      window.setTimeout(() => setShowCelebration(false), 1800);
+    }
   };
 
   return (

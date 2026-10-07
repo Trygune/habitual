@@ -2,12 +2,13 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import CalenderDay from "../CalenderDay/CalenderDay";
 import { HabitProps } from "@/types/habit";
+import { Dispatch, SetStateAction } from "react";
 
 interface HabitCalenderProps {
   chosenDate: Date;
   history: Record<number, HabitProps[]>;
   weekOffset: number;
-  setWeekOffset: (d: (n: number) => number) => void;
+  setWeekOffset: Dispatch<SetStateAction<number>>;
   handleSelectDate: (d: Date) => void;
 }
 

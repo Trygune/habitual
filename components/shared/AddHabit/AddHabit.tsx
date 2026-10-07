@@ -1,36 +1,41 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { createHabit } from "@/services/habit.service";
 import { HabitProps } from "@/types/habit";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 interface AddHabitProps {
-  setHabits: (n: (current: HabitProps[]) => HabitProps[]) => void;
-  setIsAdding: (b: boolean) => void;
+  setHabits: Dispatch<SetStateAction<HabitProps[]>>;
+  setIsAdding: Dispatch<SetStateAction<boolean>>;
 }
 
 const AddHabit = ({ setHabits, setIsAdding }: AddHabitProps) => {
   const [newHabit, setNewHabit] = useState("");
   const [newDetail, setNewDetail] = useState("");
+
   const cancelNewHabit = () => {
     setNewHabit("");
     setNewDetail("");
     setIsAdding(false);
   };
 
-  const addNewHabit = () => {
+  const addNewHabit = async () => {
     const name = newHabit.trim();
-    if (!name) return;
-    setHabits((current) => {
-      const habit = {
-        id: Date.now(),
-        name,
-        detail: newDetail.trim() || "Daily habit",
-        completed: false,
-      };
 
-      return [...current, habit];
-    });
+    if (!name) return;
+
+    const habit: HabitProps = {
+      id: Date.now(),
+      name,
+      detail: newDetail.trim() || "Daily habit",
+      completed: false,
+    };
+
+    await createHabit(habit);
+
+    setHabits((current) => [...current, habit]);
+
     cancelNewHabit();
   };
 
@@ -43,7 +48,7 @@ const AddHabit = ({ setHabits, setIsAdding }: AddHabitProps) => {
         onKeyDown={(event) => {
           if (event.key === "Enter" && !event.nativeEvent.isComposing)
             addNewHabit();
-          if (event.key === "Escape") setIsAdding(false);
+          if (event.key === "Escape") cancelNewHabit();
         }}
         placeholder="Name your new habit"
         className="w-full bg-transparent font-normal focus-visible:ring-0 border-none placeholder:text-[#aaa] dark:placeholder:text-[#b6b6b6]"
@@ -55,7 +60,7 @@ const AddHabit = ({ setHabits, setIsAdding }: AddHabitProps) => {
         onKeyDown={(event) => {
           if (event.key === "Enter" && !event.nativeEvent.isComposing)
             addNewHabit();
-          if (event.key === "Escape") setIsAdding(false);
+          if (event.key === "Escape") cancelNewHabit();
         }}
         placeholder="Add a detail (e.g. 20 minutes)"
         className="w-full bg-transparent font-light focus-visible:ring-0 border-none placeholder:text-[#aaa] dark:placeholder:text-[#b6b6b6]"
