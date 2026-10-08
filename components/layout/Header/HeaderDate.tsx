@@ -7,11 +7,10 @@ import {
 } from "@/components/ui/popover";
 import { formatDate } from "@/lib/formatDate";
 import { ChevronDownIcon } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
 
 interface HeaderDateProps {
   date: Date | undefined;
-  setDate: Dispatch<SetStateAction<Date>>;
+  setDate: (d: Date) => void;
 }
 
 const HeaderDate = ({ date, setDate }: HeaderDateProps) => {

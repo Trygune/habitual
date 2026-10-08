@@ -19,8 +19,13 @@ import {
   getHistory,
   updateHistory,
 } from "@/services/history.service";
+import { deleteUserSettings, getUserSettings } from "@/services/user.service";
+import Onboarding from "@/components/shared/Onboarding/Onboarding";
+import LoadingState from "@/components/shared/LoadingState/LoadingState";
 
 const App = () => {
+  const [userName, setUserName] = useState<string | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [habits, setHabits] = useState<HistoryHabit[]>([]);
   const [history, setHistory] = useState<Record<number, HistoryHabit[]>>({});
   const [isAdding, setIsAdding] = useState(false);
@@ -64,6 +69,11 @@ const App = () => {
     setWeekOffset(0);
   };
 
+  const handleChangeName = async () => {
+    await deleteUserSettings();
+    setUserName(null);
+  };
+
   const toggleAllHabits = async () => {
     if (habits.length === 0) return;
 
@@ -97,6 +107,17 @@ const App = () => {
       window.setTimeout(() => setShowCelebration(false), 1800);
     }
   };
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const settings = await getUserSettings();
+
+      setUserName(settings?.name ?? null);
+      setIsLoadingUser(false);
+    };
+
+    loadUser();
+  }, []);
 
   useEffect(() => {
     if (!isAdding) return;
@@ -137,9 +158,22 @@ const App = () => {
     loadWeekHistory();
   }, [date, weekOffset]);
 
+  if (isLoadingUser) {
+    return <LoadingState />;
+  } else {
+    if (!userName) {
+      return <Onboarding onComplete={setUserName} />;
+    }
+  }
+
   return (
     <main className="mx-auto px-5 gap-y-5 flex min-h-dvh w-full max-w-md flex-col overscroll-contain bg-[#f8f8f6] dark:bg-[#111] shadow-[0_24px_80px_rgba(0,0,0,0.12)]">
-      <Header date={date} handleSelectDate={handleSelectDate} />
+      <Header
+        userName={userName}
+        date={date}
+        handleSelectDate={handleSelectDate}
+        handleChangeName={handleChangeName}
+      />
       <HabitCalender
         history={history}
         weekOffset={weekOffset}

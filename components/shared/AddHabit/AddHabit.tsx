@@ -106,14 +106,14 @@ const AddHabit = ({
           onClick={cancelNewHabit}
           variant="ghost"
           size="sm"
-          className="rounded-xl text-xs font-semibold text-gray-500 transition-colors hover:bg-[#f1f1ef] hover:text-[#111] dark:text-gray-300 dark:hover:bg-[#1b1b1b] dark:hover:text-[#f1f1ef]"
+          className="rounded-xl text-xs font-semibold text-gray-500 transition-colors hover:bg-[#f1f1ef] hover:text-[#111] dark:hover:bg-[#1b1b1b] dark:hover:text-[#f1f1ef]"
         >
           Cancel
         </Button>
         <Button
           onClick={addNewHabit}
           size="sm"
-          className="rounded-xl bg-[#111] text-xs font-semibold text-[#f8f8f6] transition-transform active:scale-95 dark:bg-[#f8f8f6] dark:text-[#111]"
+          className="rounded-xl bg-[#111] text-xs font-semibold text-[#f8f8f6] transition-transform active:scale-95 dark:bg-[#e7e7e6] dark:text-[#111]"
         >
           Add
         </Button>
