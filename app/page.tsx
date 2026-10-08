@@ -11,7 +11,7 @@ import AddHabit from "@/components/shared/AddHabit/AddHabit";
 import { Button } from "@/components/ui/button";
 import { HistoryHabit } from "@/types/habit";
 import { cn } from "cn";
-import { getHabits, getHabitsForDate } from "@/services/habit.service";
+import { getHabitsForDate } from "@/services/habit.service";
 import { Badge } from "@/components/ui/badge";
 import {
   createHistory,
@@ -143,9 +143,9 @@ const App = () => {
       <HabitCalender
         history={history}
         weekOffset={weekOffset}
+        chosenDate={date}
         setWeekOffset={setWeekOffset}
         handleSelectDate={handleSelectDate}
-        chosenDate={date}
       />
 
       <section className={cn(isFuture && "pointer-events-none opacity-50")}>

@@ -57,6 +57,8 @@ const HabitCalender = ({
           aria-live="polite"
         >
           {visibleDays.map(({ date, label }, index) => {
+            const isToday = date.toDateString() === new Date().toDateString();
+
             const isSelected =
               date.toDateString() === chosenDate.toDateString();
             const dayHabits = history[date.getTime()];
@@ -72,6 +74,7 @@ const HabitCalender = ({
                 label={label}
                 index={index}
                 isSelected={isSelected}
+                isToday={isToday}
                 history={history}
                 handleSelectDate={handleSelectDate}
                 daysLength={visibleDays.length}

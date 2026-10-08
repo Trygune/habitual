@@ -7,6 +7,7 @@ interface CalenderDayProps {
   index: number;
   daysLength: number;
   date: Date;
+  isToday: boolean;
   label: string;
   history: Record<number, HistoryHabit[]>;
   isSelected: boolean;
@@ -23,6 +24,7 @@ const CalenderDay = ({
   daysLength,
   hasHistory,
   completedAll,
+  isToday,
 }: CalenderDayProps) => {
   return (
     <>
@@ -37,6 +39,7 @@ const CalenderDay = ({
         <span
           className={cn(
             "grid size-6 place-items-center rounded-full text-xs font-semibold transition-all",
+            isToday && "underline",
             isSelected
               ? "text-[#f8f8f6] bg-[#111] dark:text-[#111] dark:bg-gray-200 shadow-[0_3px_8px_rgba(0,0,0,0.18)]"
               : completedAll
