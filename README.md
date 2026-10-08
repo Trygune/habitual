@@ -210,7 +210,7 @@ habitual/
 * [x] PWA support
 * [x] Install experience
 * [x] Dark mode
-* [ ] Android TWA
+* [x] Android TWA
 * [ ] Google Play release
 * [ ] App screenshots & store listing
 * [ ] Optional data export/import
