@@ -127,7 +127,7 @@ Add to Home Screen
 
 Habitual can be installed as a PWA directly from a supported browser.
 
-An Android version is also planned using Trusted Web Activity (TWA).
+An Android version is also available using Trusted Web Activity (TWA).
 
 ## Android / TWA
 
