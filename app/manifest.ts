@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 const manifest = (): MetadataRoute.Manifest => ({
+  id: "/",
   name: "Habitual",
   short_name: "Habitual",
   icons: [
