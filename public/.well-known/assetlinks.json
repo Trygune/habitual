@@ -3,6 +3,6 @@
       "target": {
         "namespace": "android_app",
         "package_name": "com.trygune.habitual",
-        "sha256_cert_fingerprints": ["49:04:01:0D:94:2F:87:E9:3C:F2:1E:50:25:DD:20:9C:96:0B:A6:68:77:12:60:04:8F:09:44:6E:D4:D7:35:D5"]
+        "sha256_cert_fingerprints": ["0C:BE:D1:96:4E:51:26:A7:3B:27:75:77:2F:6F:96:31:37:FA:D4:59:EA:51:6B:D8:F4:1A:C1:8D:89:AF:07:94"]
       }
     }]
