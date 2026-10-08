@@ -2,15 +2,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { createHabit } from "@/services/habit.service";
-import { HabitProps } from "@/types/habit";
+import {
+  createHistory,
+  getHistory,
+  updateHistory,
+} from "@/services/history.service";
+import { HabitProps, HistoryHabit } from "@/types/habit";
 import { Dispatch, SetStateAction, useState } from "react";
 
 interface AddHabitProps {
-  setHabits: Dispatch<SetStateAction<HabitProps[]>>;
+  setHabits: Dispatch<SetStateAction<HistoryHabit[]>>;
   setIsAdding: Dispatch<SetStateAction<boolean>>;
+  isToday: boolean;
+  historyDateId: number;
 }
 
-const AddHabit = ({ setHabits, setIsAdding }: AddHabitProps) => {
+const AddHabit = ({
+  setHabits,
+  setIsAdding,
+  isToday,
+  historyDateId,
+}: AddHabitProps) => {
   const [newHabit, setNewHabit] = useState("");
   const [newDetail, setNewDetail] = useState("");
 
@@ -25,16 +37,40 @@ const AddHabit = ({ setHabits, setIsAdding }: AddHabitProps) => {
 
     if (!name) return;
 
+    const now = new Date();
+
     const habit: HabitProps = {
       id: Date.now(),
       name,
       detail: newDetail.trim() || "Daily habit",
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    const historyHabit: HistoryHabit = {
+      ...habit,
       completed: false,
     };
 
-    await createHabit(habit);
+    if (isToday) {
+      await createHabit(habit);
+    }
 
-    setHabits((current) => [...current, habit]);
+    const history = await getHistory(historyDateId);
+
+    if (history) {
+      await updateHistory({
+        id: historyDateId,
+        habits: [...history.habits, historyHabit],
+      });
+    } else {
+      await createHistory({
+        id: historyDateId,
+        habits: [historyHabit],
+      });
+    }
+
+    setHabits((current) => [...current, historyHabit]);
 
     cancelNewHabit();
   };

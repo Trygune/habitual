@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { Check, Plus, X } from "lucide-react";
 import ProgressBar from "@/components/shared/ProgressBar/ProgressBar";
 import Footer from "@/components/layout/Footer/Footer";
 import HabitList from "@/components/shared/HabitList.tsx/HabitList";
@@ -9,47 +9,94 @@ import HabitCalender from "@/components/shared/HabitCalender/HabitCalender";
 import Header from "@/components/layout/Header/Header";
 import AddHabit from "@/components/shared/AddHabit/AddHabit";
 import { Button } from "@/components/ui/button";
-import { HabitProps } from "@/types/habit";
+import { HistoryHabit } from "@/types/habit";
 import { cn } from "cn";
-import { getHabits } from "@/services/habit.service";
+import { getHabits, getHabitsForDate } from "@/services/habit.service";
+import { Badge } from "@/components/ui/badge";
+import {
+  createHistory,
+  getHistories,
+  getHistory,
+  updateHistory,
+} from "@/services/history.service";
 
 const App = () => {
-  const [habits, setHabits] = useState<HabitProps[]>([]);
-  const [history, setHistory] = useState<Record<number, HabitProps[]>>({});
+  const [habits, setHabits] = useState<HistoryHabit[]>([]);
+  const [history, setHistory] = useState<Record<number, HistoryHabit[]>>({});
   const [isAdding, setIsAdding] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [weekOffset, setWeekOffset] = useState(0);
   const [date, setDate] = useState<Date>(
     new Date(new Date().setHours(0, 0, 0, 0)),
   );
+  const todayId = new Date(new Date().setHours(0, 0, 0, 0)).getTime();
   const historyDateId = date.getTime();
+
+  const isToday = historyDateId === todayId;
+  const isFuture = historyDateId > todayId;
 
   const completed = habits.filter((habit) => habit.completed).length;
 
-  const isFuture = date > new Date();
+  const loadWeekHistory = async () => {
+    const startOfWeek = new Date(date);
+    const day = startOfWeek.getDay();
+    const diff = (day + 1) % 7;
+
+    startOfWeek.setDate(startOfWeek.getDate() - diff + weekOffset * 7);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(endOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    const histories = await getHistories(
+      startOfWeek.getTime(),
+      endOfWeek.getTime(),
+    );
+
+    setHistory(
+      Object.fromEntries(histories.map((item) => [item.id, item.habits])),
+    );
+  };
 
   const handleSelectDate = (date: Date) => {
     setDate(date);
-    setWeekOffset(() => 0);
+    setWeekOffset(0);
   };
 
-  useEffect(() => {
-    const loadHabits = async () => {
-      const storedHabits = await getHabits();
+  const toggleAllHabits = async () => {
+    if (habits.length === 0) return;
 
-      setHabits(storedHabits);
-    };
+    const history = await getHistory(historyDateId);
 
-    loadHabits();
-  }, []);
+    const shouldComplete = habits.some((habit) => !habit.completed);
+    const updatedAt = new Date();
 
-  useEffect(() => {
-    setHabits(
-      history[historyDateId] ??
-        habits.map((habit) => ({ ...habit, completed: false })),
-    );
-    setIsAdding(false);
-  }, [date]);
+    const next = habits.map((habit) => ({
+      ...habit,
+      completed: shouldComplete,
+      updatedAt,
+    }));
+
+    if (history) {
+      await updateHistory({
+        id: historyDateId,
+        habits: next,
+      });
+    } else {
+      await createHistory({
+        id: historyDateId,
+        habits: next,
+      });
+    }
+
+    setHabits(next);
+
+    if (shouldComplete && next.length > 0) {
+      setShowCelebration(true);
+      window.setTimeout(() => setShowCelebration(false), 1800);
+    }
+  };
 
   useEffect(() => {
     if (!isAdding) return;
@@ -61,22 +108,37 @@ const App = () => {
   }, [isAdding]);
 
   useEffect(() => {
-    setHistory((saved) => {
-      const updated = { ...saved };
+    const loadHistory = async () => {
+      const storedHistory = await getHistory(historyDateId);
 
-      if (habits.length === 0) {
-        if (saved[historyDateId]) {
-          delete updated[historyDateId];
-        }
-        return updated;
+      if (storedHistory) {
+        // This day already has history
+        setHabits(storedHistory.habits);
+
+        return;
       }
 
-      return { ...saved, [historyDateId]: habits };
-    });
-  }, [habits]);
+      const storedHabits = await getHabitsForDate(date);
+
+      // No history → build the day's current habit snapshot
+      setHabits(
+        storedHabits.map((habit) => ({
+          ...habit,
+          completed: false,
+        })),
+      );
+    };
+
+    setIsAdding(false);
+    loadHistory();
+  }, [date]);
+
+  useEffect(() => {
+    loadWeekHistory();
+  }, [date, weekOffset]);
 
   return (
-    <main className="mx-auto px-5 gap-y-5 flex min-h-screen w-full max-w-md flex-col overscroll-contain bg-[#f8f8f6] dark:bg-[#111] shadow-[0_24px_80px_rgba(0,0,0,0.12)]">
+    <main className="mx-auto px-5 gap-y-5 flex min-h-dvh w-full max-w-md flex-col overscroll-contain bg-[#f8f8f6] dark:bg-[#111] shadow-[0_24px_80px_rgba(0,0,0,0.12)]">
       <Header date={date} handleSelectDate={handleSelectDate} />
       <HabitCalender
         history={history}
@@ -97,15 +159,61 @@ const App = () => {
       <section
         className={cn("flex-1", isFuture && "pointer-events-none opacity-50")}
       >
+        <div
+          className={cn(
+            "mb-1 flex items-center justify-between",
+            habits.length !== 0 && "mb-2.5",
+          )}
+        >
+          <h2 className="text-sm font-semibold tracking-tight">
+            Today&apos;s habits
+          </h2>
+          <div className="flex items-center gap-2">
+            <Badge
+              variant="ghost"
+              className="text-[11px] font-medium text-gray-400"
+            >
+              {habits.length} total
+            </Badge>
+            {habits.length !== 0 && (
+              <Button
+                onClick={toggleAllHabits}
+                aria-label={
+                  completed === habits.length
+                    ? "Uncheck all habits"
+                    : "Check all habits"
+                }
+                variant="ghost"
+                size="xs"
+                className="text-[10px] border border-gray-300 font-semibold text-gray-500 transition-colors hover:border-[#111] active:scale-95 dark:border-gray-400 dark:text-gray-300 dark:hover:border-[#f8f8f6]"
+              >
+                {completed === habits.length ? "Clear" : "Check all"}
+                {completed === habits.length ? (
+                  <X data-icon="inline-end" />
+                ) : (
+                  <Check data-icon="inline-end" />
+                )}
+              </Button>
+            )}
+          </div>
+        </div>
+
         <HabitList
           habits={habits}
+          isToday={isToday}
+          date={date}
+          historyDateId={historyDateId}
           setHabits={setHabits}
           setShowCelebration={setShowCelebration}
-          completed={completed}
         />
 
         {isAdding ? (
-          <AddHabit setHabits={setHabits} setIsAdding={setIsAdding} />
+          <AddHabit
+            setHabits={setHabits}
+            setIsAdding={setIsAdding}
+            isToday={isToday}
+            historyDateId={historyDateId}
+          />
         ) : (
           <Button
             onClick={() => setIsAdding(true)}

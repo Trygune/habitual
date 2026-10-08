@@ -65,7 +65,7 @@ const RootLayout = ({
       <body className="antialiased">
         <SerwistProvider swUrl="/serwist/sw.js">
           <ThemeProvider>
-            <div className="min-h-screen overflow-y-auto bg-[#ededeb] text-[#111] dark:bg-[#111] dark:text-[#ededeb]">
+            <div className="min-h-dvh overflow-y-auto bg-[#ededeb] text-[#111] dark:bg-[#111] dark:text-[#ededeb]">
               {children}
             </div>
           </ThemeProvider>

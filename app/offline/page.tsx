@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const OfflinePage = () => {
   return (
-    <main className="mx-auto px-5 min-h-screen flex w-full max-w-md flex-col items-center justify-center text-center bg-[#f8f8f6] dark:bg-[#111] shadow-[0_24px_80px_rgba(0,0,0,0.12)]">
+    <main className="mx-auto px-5 min-h-dvh flex w-full max-w-md flex-col items-center justify-center text-center bg-[#f8f8f6] dark:bg-[#111] shadow-[0_24px_80px_rgba(0,0,0,0.12)]">
       <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border bg-[#f8f8f6]/50 dark:bg-[#111]/50">
         <WifiOff />
       </div>
@@ -22,11 +22,12 @@ const OfflinePage = () => {
         habits and progress are stored on this device.
       </p>
 
-      <Button
-        className="mt-6 px-4"
-        size="lg"
-        render={<Link href="/">Try Again</Link>}
-      />
+      <Link
+        href="/"
+        className="mt-6 rounded-lg bg-[#111] px-4 py-2 text-sm font-semibold text-[#f8f8f6] transition-transform active:scale-95 dark:bg-[#f8f8f6] dark:text-[#111]"
+      >
+        Back to habits
+      </Link>
     </main>
   );
 };

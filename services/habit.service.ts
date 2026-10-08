@@ -5,20 +5,17 @@ export const getHabits = async (): Promise<HabitProps[]> => {
   return db.habits.toArray();
 };
 
-export const getHabit = async (id: number): Promise<HabitProps | undefined> => {
-  return db.habits.get(id);
+export const getHabitsForDate = async (date: Date): Promise<HabitProps[]> => {
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const habits = await getHabits();
+
+  return habits.filter((habit) => habit.createdAt <= endOfDay);
 };
 
 export const createHabit = async (habit: HabitProps): Promise<number> => {
   return db.habits.add(habit);
-};
-
-export const updateHabit = async (habit: HabitProps): Promise<number> => {
-  return db.habits.update(habit.id, habit);
-};
-
-export const updateHabits = async (habits: HabitProps[]): Promise<void> => {
-  await db.habits.bulkPut(habits);
 };
 
 export const deleteHabit = async (id: number): Promise<void> => {

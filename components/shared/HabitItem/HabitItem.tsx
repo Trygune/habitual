@@ -1,38 +1,75 @@
 import { Button } from "@/components/ui/button";
-import { deleteHabit, getHabit, updateHabit } from "@/services/habit.service";
-import { HabitProps } from "@/types/habit";
+import { deleteHabit, getHabitsForDate } from "@/services/habit.service";
+import {
+  createHistory,
+  getHistory,
+  updateHistory,
+} from "@/services/history.service";
+import { HistoryHabit } from "@/types/habit";
 import { cn } from "cn";
 import { Check, Trash2 } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 
 interface HabitItemProps {
-  habit: HabitProps;
-  setHabits: Dispatch<SetStateAction<HabitProps[]>>;
+  habit: HistoryHabit;
+  isToday: boolean;
+  date: Date;
+  historyDateId: number;
+  setHabits: Dispatch<SetStateAction<HistoryHabit[]>>;
   setShowCelebration: Dispatch<SetStateAction<boolean>>;
 }
 
 const HabitItem = ({
   habit,
+  isToday,
+  historyDateId,
+  date,
   setHabits,
   setShowCelebration,
 }: HabitItemProps) => {
   const [removingId, setRemovingId] = useState<number | null>(null);
 
   const toggleHabit = async (id: number) => {
-    const habit = await getHabit(id);
+    const history = await getHistory(historyDateId);
 
-    if (!habit) return;
+    if (history) {
+      const habits = history.habits.map((habit) =>
+        habit.id === id
+          ? {
+              ...habit,
+              completed: !habit.completed,
+              updatedAt: new Date(),
+            }
+          : habit,
+      );
 
-    const updatedHabit = {
-      ...habit,
-      completed: !habit.completed,
-    };
+      await updateHistory({
+        id: historyDateId,
+        habits,
+      });
+    } else {
+      const habits = await getHabitsForDate(date);
 
-    await updateHabit(updatedHabit);
+      const historyHabits: HistoryHabit[] = habits.map((habit) => ({
+        ...habit,
+        completed: habit.id === id,
+      }));
+
+      await createHistory({
+        id: historyDateId,
+        habits: historyHabits,
+      });
+    }
 
     setHabits((current) => {
       const next = current.map((habit) =>
-        habit.id === id ? updatedHabit : habit,
+        habit.id === id
+          ? {
+              ...habit,
+              completed: !habit.completed,
+              updatedAt: new Date(),
+            }
+          : habit,
       );
       if (
         next.length > 0 &&
@@ -47,11 +84,34 @@ const HabitItem = ({
   };
 
   const removeHabit = async (id: number) => {
-    const habit = await getHabit(id);
+    if (isToday) {
+      await deleteHabit(id);
+    }
 
-    if (!habit) return;
+    const history = await getHistory(historyDateId);
 
-    await deleteHabit(id);
+    if (history) {
+      const habits = history.habits.filter((habit) => habit.id !== id);
+
+      await updateHistory({
+        id: historyDateId,
+        habits,
+      });
+    } else {
+      const habits = await getHabitsForDate(date);
+
+      const historyHabits: HistoryHabit[] = habits
+        .filter((habit) => habit.id !== id)
+        .map((habit) => ({
+          ...habit,
+          completed: false,
+        }));
+
+      await createHistory({
+        id: historyDateId,
+        habits: historyHabits,
+      });
+    }
 
     setRemovingId(id);
     window.setTimeout(() => {
@@ -62,7 +122,6 @@ const HabitItem = ({
 
   return (
     <div
-      key={habit.id}
       className={cn(
         "habit-row group flex items-center gap-3 rounded-2xl border border-gray-200 bg-[#f8f8f6] dark:bg-[#111] dark:border-gray-500 p-3.5 transition-all duration-300",
         removingId === habit.id && "habit-removing",

@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import CalenderDay from "../CalenderDay/CalenderDay";
-import { HabitProps } from "@/types/habit";
+import { HistoryHabit } from "@/types/habit";
 import { Dispatch, SetStateAction } from "react";
 
 interface HabitCalenderProps {
   chosenDate: Date;
-  history: Record<number, HabitProps[]>;
+  history: Record<number, HistoryHabit[]>;
   weekOffset: number;
   setWeekOffset: Dispatch<SetStateAction<number>>;
   handleSelectDate: (d: Date) => void;
@@ -57,7 +57,6 @@ const HabitCalender = ({
           aria-live="polite"
         >
           {visibleDays.map(({ date, label }, index) => {
-            const isFuture = date > new Date();
             const isSelected =
               date.toDateString() === chosenDate.toDateString();
             const dayHabits = history[date.getTime()];
@@ -73,7 +72,6 @@ const HabitCalender = ({
                 label={label}
                 index={index}
                 isSelected={isSelected}
-                isFuture={isFuture}
                 history={history}
                 handleSelectDate={handleSelectDate}
                 daysLength={visibleDays.length}

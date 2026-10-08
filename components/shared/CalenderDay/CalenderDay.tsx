@@ -1,5 +1,5 @@
 import { Separator } from "@/components/ui/separator";
-import { HabitProps } from "@/types/habit";
+import { HistoryHabit } from "@/types/habit";
 import { cn } from "cn";
 
 interface CalenderDayProps {
@@ -8,8 +8,7 @@ interface CalenderDayProps {
   daysLength: number;
   date: Date;
   label: string;
-  history: Record<number, HabitProps[]>;
-  isFuture: boolean;
+  history: Record<number, HistoryHabit[]>;
   isSelected: boolean;
   hasHistory: boolean;
   completedAll: boolean;
@@ -19,7 +18,6 @@ const CalenderDay = ({
   date,
   label,
   index,
-  isFuture,
   isSelected,
   handleSelectDate,
   daysLength,
@@ -30,11 +28,9 @@ const CalenderDay = ({
     <>
       <button
         onClick={() => handleSelectDate(date)}
-        disabled={isFuture}
         aria-label={`View ${label} ${date.getDate()}`}
         className={cn(
           "flex animate-[habit-add_260ms_ease-out] flex-col items-center gap-2",
-          isFuture && "cursor-not-allowed opacity-35",
         )}
       >
         <span className="text-[10px] font-medium text-gray-400">{label}</span>
