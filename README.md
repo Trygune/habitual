@@ -27,12 +27,13 @@ Habitual works entirely on your device, so your habits are available even when y
 **Web App:**
 [Habitual](https://habitual-tracer.vercel.app)
 
-**Android:**
-Coming soon on Google Play
+## 📱 Android App
 
-## Screenshots
+Habitual is also available as an Android app through a Trusted Web Activity (TWA), providing the same fast, offline-first experience as the PWA.
 
-*Add screenshots here.*
+**Download on Android:** [Habitual.apk](https://drive.google.com/file/d/1VnD7dwKdgSeAPGTK-GKYx4NyP3wr63IO/view?usp=sharing)
+
+> Requires Android 7.0 or later.
 
 ## Tech Stack
 
