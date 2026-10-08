@@ -17,10 +17,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/icons/icon.png",
+        url: "/icons/icon1.png",
       },
       {
-        url: "/icons/icon.svg",
+        url: "/icons/icon0.svg",
         type: "image/svg+xml",
       },
     ],
