@@ -1,1 +1,8 @@
-{}
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.trygune.habitual",
+        "sha256_cert_fingerprints": ["49:04:01:0D:94:2F:87:E9:3C:F2:1E:50:25:DD:20:9C:96:0B:A6:68:77:12:60:04:8F:09:44:6E:D4:D7:35:D5"]
+      }
+    }]
