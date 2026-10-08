@@ -2,9 +2,10 @@ import { SerwistProvider } from "@serwist/turbopack/react";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ThemeProvider from "@/providers/ThemeProvider";
+import InstallBanner from "@/components/pwa/InstallBanner";
 
 const APP_NAME = "Habitual";
-const APP_DEFAULT_TITLE = "Habit — Build better days";
+const APP_DEFAULT_TITLE = "Habitual — Build better days";
 const APP_DESCRIPTION =
   "A focused, minimalist habit tracker for better daily routines.";
 
@@ -70,6 +71,7 @@ const RootLayout = ({
             </div>
           </ThemeProvider>
         </SerwistProvider>
+        <InstallBanner />
       </body>
     </html>
   );
