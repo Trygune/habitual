@@ -47,16 +47,22 @@ const AddHabit = ({
       updatedAt: now,
     };
 
+    const history = await getHistory(historyDateId);
+    const currentHabits = history?.habits ?? [];
+
     const historyHabit: HistoryHabit = {
       ...habit,
       completed: false,
+      order:
+        currentHabits.reduce(
+          (max, item) => Math.max(max, item.order ?? -1),
+          -1,
+        ) + 1,
     };
 
     if (isToday) {
       await createHabit(habit);
     }
-
-    const history = await getHistory(historyDateId);
 
     if (history) {
       await updateHistory({

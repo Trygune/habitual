@@ -50,9 +50,10 @@ const HabitItem = ({
     } else {
       const habits = await getHabitsForDate(date);
 
-      const historyHabits: HistoryHabit[] = habits.map((habit) => ({
+      const historyHabits: HistoryHabit[] = habits.map((habit, index) => ({
         ...habit,
         completed: habit.id === id,
+        order: index,
       }));
 
       await createHistory({
@@ -91,7 +92,21 @@ const HabitItem = ({
     const history = await getHistory(historyDateId);
 
     if (history) {
-      const habits = history.habits.filter((habit) => habit.id !== id);
+      const habits = history.habits
+        .filter((habit) => habit.id !== id)
+        .map((habit) => ({
+          ...habit,
+          ...(habit.order !== undefined && {
+            order:
+              habit.order -
+              (history.habits.find((item) => item.id === id)?.order !==
+                undefined &&
+              history.habits.find((item) => item.id === id)!.order! <
+                habit.order
+                ? 1
+                : 0),
+          }),
+        }));
 
       await updateHistory({
         id: historyDateId,
@@ -102,9 +117,11 @@ const HabitItem = ({
 
       const historyHabits: HistoryHabit[] = habits
         .filter((habit) => habit.id !== id)
-        .map((habit) => ({
+        .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+        .map((habit, index) => ({
           ...habit,
           completed: false,
+          order: index,
         }));
 
       await createHistory({
@@ -115,7 +132,14 @@ const HabitItem = ({
 
     setRemovingId(id);
     window.setTimeout(() => {
-      setHabits((current) => current.filter((habit) => habit.id !== id));
+      setHabits((current) => {
+        const next = current.filter((habit) => habit.id !== id);
+
+        return next.map((habit, index) => ({
+          ...habit,
+          ...(habit.order !== undefined && { order: index }),
+        }));
+      });
       setRemovingId(null);
     }, 260);
   };

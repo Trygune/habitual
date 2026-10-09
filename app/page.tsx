@@ -82,9 +82,10 @@ const App = () => {
     const shouldComplete = habits.some((habit) => !habit.completed);
     const updatedAt = new Date();
 
-    const next = habits.map((habit) => ({
+    const next = habits.map((habit, index) => ({
       ...habit,
       completed: shouldComplete,
+      order: index,
       updatedAt,
     }));
 
@@ -143,9 +144,10 @@ const App = () => {
 
       // No history → build the day's current habit snapshot
       setHabits(
-        storedHabits.map((habit) => ({
+        storedHabits.map((habit, index) => ({
           ...habit,
           completed: false,
+          order: index,
         })),
       );
     };

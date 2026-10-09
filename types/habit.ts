@@ -8,6 +8,7 @@ export interface HabitProps {
 
 export interface HistoryHabit extends HabitProps {
   completed: boolean;
+  order: number;
 }
 
 export type HistoryProps = {

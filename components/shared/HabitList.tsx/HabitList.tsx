@@ -2,6 +2,7 @@ import HabitItem from "../HabitItem/HabitItem";
 import { HistoryHabit } from "@/types/habit";
 import EmptyState from "../EmptyState/EmptyState";
 import { Dispatch, SetStateAction } from "react";
+import { sortHistoryHabits } from "@/lib/sortHabits";
 
 interface HabitListProps {
   habits: HistoryHabit[];
@@ -22,9 +23,12 @@ const HabitList = ({
 }: HabitListProps) => {
   if (habits.length === 0) return <EmptyState />;
 
+  const sortedHabits = sortHistoryHabits(habits);
+  console.log(sortedHabits);
+
   return (
     <div className="space-y-2.5">
-      {habits.map((habit) => (
+      {sortedHabits.map((habit) => (
         <HabitItem
           key={habit.createdAt.toISOString()}
           habit={habit}
