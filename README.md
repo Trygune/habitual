@@ -22,17 +22,18 @@ Habitual works entirely on your device, so your habits are available even when y
 * No backend required
 * No data leaves your device
 
+## Android App
+
+Habitual is also available as an Android app through a Trusted Web Activity (TWA), providing the same fast, offline-first experience as the PWA.
+
+**Download on Android:** [Habitual.apk](https://drive.google.com/file/d/1VnD7dwKdgSeAPGTK-GKYx4NyP3wr63IO/view?usp=sharing)
+
+> Requires Android 7.0 or later.
+
 ## Demo
 
 **Web App:**
 [Habitual](https://habitual-tracer.vercel.app)
-
-**Android:**
-Coming soon on Google Play
-
-## Screenshots
-
-*Add screenshots here.*
 
 ## Tech Stack
 
@@ -126,7 +127,7 @@ Add to Home Screen
 
 Habitual can be installed as a PWA directly from a supported browser.
 
-An Android version is also planned using Trusted Web Activity (TWA).
+An Android version is also available using Trusted Web Activity (TWA).
 
 ## Android / TWA
 
@@ -209,7 +210,7 @@ habitual/
 * [x] PWA support
 * [x] Install experience
 * [x] Dark mode
-* [ ] Android TWA
+* [x] Android TWA
 * [ ] Google Play release
 * [ ] App screenshots & store listing
 * [ ] Optional data export/import
